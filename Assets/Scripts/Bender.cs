@@ -25,8 +25,6 @@ public abstract class Bender : MonoBehaviour
     }
 
     public BenderTypes BenderType;
-    //[Range(1,2)]
-    //public int OwnerPlayerNumber = 1;
 
     public string Name;
     public States State = States.Idle;
@@ -49,9 +47,11 @@ public abstract class Bender : MonoBehaviour
     [HideInInspector]
     public Animator BenderAnimator;
     [HideInInspector]
-    public float Speed = 0f;
+    public float SpeedInput = 0f;
     [HideInInspector]
-    public float RotationSpeed = 0f;
+    public float RotationSpeedInput = 0f;
+    [HideInInspector]
+    public int AbilitySelector = -1;
 
     [HideInInspector]
     public NavMeshAgent NavAgent;
@@ -122,16 +122,16 @@ public abstract class Bender : MonoBehaviour
 
     protected void Update()
     {
+        if (State != States.Idle && State != States.Moving)
+        {
+            return;
+        }
+
         if (Owner.Type == PlayerController.PlayerTypes.Human)
         {
             if (_selected)
             {
-
-                if (State != States.Idle && State != States.Moving)
-                {
-                    return;
-                }
-
+               
                 if (Input.GetButtonDown("Ability1"))
                 {
                     StartAbility(States.Casting1, 0);
@@ -151,16 +151,32 @@ public abstract class Bender : MonoBehaviour
         }
         else
         {
-            _rigidbody.rotation = Quaternion.Euler(new Vector3(0f, _rotation + RotationSpeed * Time.deltaTime, 0f));
-            _rotation = _rotation + RotationSpeed * Time.deltaTime;
+            switch (AbilitySelector)
+            {
+                case 0:
+                    StartAbility(States.Casting1, 0);
+                    return;
+                case 1:
+                    StartAbility(States.Casting2, 1);
+                    return;
+                case 2:
+                    StartAbility(States.Casting3, 2);
+                    return;
+                default:
+                    break;
+            }
+            AbilitySelector = -1;
+            
+            _rotation += RotationSpeedInput * StandardRotationSpeed * Time.deltaTime;
+            _rigidbody.rotation = (Quaternion.Euler(new Vector3(0f, _rotation, 0f)));
             if (_rigidbody.velocity.magnitude <= 0.01)
             {
                 _rigidbody.velocity = new Vector3();
             }
-            _rigidbody.velocity += transform.forward * Speed;
+            _rigidbody.velocity = transform.forward * SpeedInput * StandardSpeed;
         }
 
-        if ((Owner.Type == PlayerController.PlayerTypes.AI && _rigidbody.velocity.magnitude > 0.01) ||
+        if ((Owner.Type == PlayerController.PlayerTypes.AI && Mathf.Abs(SpeedInput) > 0.01) ||
             (Owner.Type == PlayerController.PlayerTypes.Human && NavAgent.velocity.magnitude > 0.01))
         {
             BenderAnimator.SetBool("Moving", true);
@@ -180,6 +196,7 @@ public abstract class Bender : MonoBehaviour
         State = state;
         AbilitiesPS[number].Play();
         _rigidbody.velocity = new Vector3();
+        AbilitySelector = -1;
     }
 
     protected abstract void Cast();

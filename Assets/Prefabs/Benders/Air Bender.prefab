@@ -2089,7 +2089,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e711bb31cd8e36d4190f3c41447f181b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OwnerPlayerNumber: 1
+  BenderType: 0
   Name: Airbender
   State: 0
   StandardSpeed: 5
@@ -2104,14 +2104,16 @@ MonoBehaviour:
   OutlinedMaterial: {fileID: 2100000, guid: 27275ba2e5108e54c93bbd5cf103ad65, type: 2}
   Base: {fileID: 1859229135274092}
   Footsteps: []
+  PortraitSprite: {fileID: 21300000, guid: 57a937bf10f56ca489e33b24443b1b86, type: 3}
   BenderAnimator: {fileID: 0}
-  Speed: 0
-  RotationSpeed: 0
+  SpeedInput: 0
+  RotationSpeedInput: 0
+  AbilitySelector: -1
   NavAgent: {fileID: 0}
   ProjectileSpawnPoint: {fileID: 4033626986798046}
   SpeedBuffSpeed: 8
   SpeedBuffDuration: 10
-  BuffSarticleSystem: {fileID: 1206360835243796}
+  BuffParticleSystem: {fileID: 198884339786757750}
   AirPushPrefab: {fileID: 1984157427519418, guid: f3448fcc7d9e9744dbebf5f6baaec03c,
     type: 2}
   AirPullPrefab: {fileID: 1984157427519418, guid: 8fa43204b61450644bada85c14bcffb2,

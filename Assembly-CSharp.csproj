@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\AbilityIcon.cs" />
     <Compile Include="Assets\Scripts\AIController.cs" />
+    <Compile Include="Assets\Scripts\AIControlUtility.cs" />
     <Compile Include="Assets\Scripts\AirBender.cs" />
     <Compile Include="Assets\Scripts\AirPull.cs" />
     <Compile Include="Assets\Scripts\AirPush.cs" />
