@@ -175,8 +175,16 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0.61917174
+        functionName: FootstepSound
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: ee2c7f7d3ca1fae43912854ca4b960c2,
+          type: 3}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 1
-        functionName: Recovered
+        functionName: FootstepSound
         data: 
         objectReferenceParameter: {fileID: 11500000, guid: ee2c7f7d3ca1fae43912854ca4b960c2,
           type: 3}

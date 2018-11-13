@@ -338,6 +338,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LifeTime: 5
   Speed: 10
+  HitSound: {fileID: 8300000, guid: 59fba364a9a20184dbcf7b7e3d3023d3, type: 3}
   Power: 100
 --- !u!135 &135176157547800708
 SphereCollider:

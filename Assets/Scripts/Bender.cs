@@ -42,6 +42,8 @@ public abstract class Bender : MonoBehaviour
 
 
     public List<AudioClip> Footsteps;
+    public AudioClip FallSound;
+    public AudioClip AbilitySound;
     public Sprite PortraitSprite;
 
     [HideInInspector]
@@ -96,6 +98,14 @@ public abstract class Bender : MonoBehaviour
             Color baseColor = Owner.PlayerColor;
             baseColor.a = 0.5f;
             Base.GetComponent<Renderer>().material.color = baseColor;
+        }
+    }
+
+    public AudioSource AudioSourcePlayer
+    {
+        get
+        {
+            return _audioSource;
         }
     }
 
@@ -169,7 +179,7 @@ public abstract class Bender : MonoBehaviour
             
             _rotation += RotationSpeedInput * StandardRotationSpeed * Time.deltaTime;
             _rigidbody.rotation = (Quaternion.Euler(new Vector3(0f, _rotation, 0f)));
-            if (_rigidbody.velocity.magnitude <= 0.01)
+            if (_rigidbody.velocity.magnitude <= 0.01 && _rigidbody.velocity.y <= Mathf.Epsilon)
             {
                 _rigidbody.velocity = new Vector3();
             }
@@ -192,6 +202,7 @@ public abstract class Bender : MonoBehaviour
 
     public void StartAbility(States state, int number)
     {
+        NavAgent.isStopped = true;
         BenderAnimator.SetBool("Ability", true);
         State = state;
         AbilitiesPS[number].Play();
@@ -222,7 +233,6 @@ public abstract class Bender : MonoBehaviour
     public void Recovered()
     {
         State = States.Idle;
-        NavAgent.enabled = true;
     }
 
     public void GotSelected()
@@ -241,6 +251,7 @@ public abstract class Bender : MonoBehaviour
 
     public void FinishCast()
     {
+        _audioSource.PlayOneShot(AbilitySound);
         State = States.Idle;
         BenderAnimator.SetBool("Ability", false);
     }
@@ -251,6 +262,11 @@ public abstract class Bender : MonoBehaviour
         {
             _audioSource.PlayOneShot(Footsteps[Random.Range(0, Footsteps.Count)]);
         }
+    }
+
+    public void PlayFallSound()
+    {
+        _audioSource.PlayOneShot(FallSound);
     }
 
     public void Defeat()

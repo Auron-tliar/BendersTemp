@@ -6,6 +6,7 @@ public abstract class Projectile : MonoBehaviour
 {
     public float LifeTime = 5f;
     public float Speed = 5f;
+    public AudioClip HitSound;
     
     protected Rigidbody _rigidbody;
     protected float _creationTime;
@@ -31,5 +32,10 @@ public abstract class Projectile : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    protected void PlayHitSound(AudioSource audioSource)
+    {
+        audioSource.PlayOneShot(HitSound);
     }
 }

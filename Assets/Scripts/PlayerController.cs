@@ -27,7 +27,10 @@ public abstract class PlayerController : MonoBehaviour
             BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
             icon.DependentBender = bender;
             bender.IconObject = icon;
+            if (Type == PlayerTypes.AI)
+            {
+                bender.NavAgent.enabled = false;
+            }
         }
-
     }
 }
