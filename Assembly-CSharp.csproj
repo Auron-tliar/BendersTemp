@@ -61,12 +61,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ICE_sushishop\scripts_probes\RealtimeReflection.cs" />
+    <Compile Include="Assets\ICE_sushishop\scripts_probes\RealtimeReflection1.cs" />
     <Compile Include="Assets\Scripts\AbilityIcon.cs" />
     <Compile Include="Assets\Scripts\AIController.cs" />
     <Compile Include="Assets\Scripts\AIControlUtility.cs" />
     <Compile Include="Assets\Scripts\AirBender.cs" />
     <Compile Include="Assets\Scripts\AirPull.cs" />
-    <Compile Include="Assets\Scripts\AirPush.cs" />
     <Compile Include="Assets\Scripts\Bender.cs" />
     <Compile Include="Assets\Scripts\BenderIconController.cs" />
     <Compile Include="Assets\Scripts\CameraMovement.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\PlayerControls.cs" />
     <Compile Include="Assets\Scripts\Projectile.cs" />
+    <Compile Include="Assets\Scripts\Push.cs" />
     <Compile Include="Assets\Scripts\RotateTag.cs" />
     <Compile Include="Assets\Scripts\Selection.cs" />
     <Compile Include="Assets\Scripts\SelfDestruct.cs" />
@@ -86,6 +88,8 @@
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Shaders\OutlinedShader.shader" />
+    <None Include="Assets\ICE_sushishop\Shader\Ice(break).shader" />
+    <None Include="Assets\ICE_sushishop\Shader\Glass.shader" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\Shaders\UltimateOutline.shader" />

@@ -116,7 +116,7 @@ public abstract class Bender : MonoBehaviour
         BenderAnimator = GetComponent<Animator>();
         Nameplate.text = Name;
         _renderer = MeshChild.GetComponent<Renderer>();
-        _defaultMaterial = _renderer.material;
+        _defaultMaterial = _renderer.materials[0];
         _audioSource = GetComponent<AudioSource>();
         foreach (ParticleSystem ps in AbilitiesPS)
         {
@@ -141,7 +141,6 @@ public abstract class Bender : MonoBehaviour
         {
             if (_selected)
             {
-               
                 if (Input.GetButtonDown("Ability1"))
                 {
                     StartAbility(States.Casting1, 0);
@@ -185,7 +184,7 @@ public abstract class Bender : MonoBehaviour
             }
             _rigidbody.velocity = transform.forward * SpeedInput * StandardSpeed;
         }
-
+        
         if ((Owner.Type == PlayerController.PlayerTypes.AI && Mathf.Abs(SpeedInput) > 0.01) ||
             (Owner.Type == PlayerController.PlayerTypes.Human && NavAgent.velocity.magnitude > 0.01))
         {
@@ -223,6 +222,7 @@ public abstract class Bender : MonoBehaviour
         BenderAnimator.SetTrigger("Hit");
         State = States.Recovering;
         BenderAnimator.SetBool("Moving", false);
+        NavAgent.isStopped = true;
     }
 
     public void GotRevived()
@@ -233,18 +233,19 @@ public abstract class Bender : MonoBehaviour
     public void Recovered()
     {
         State = States.Idle;
+        NavAgent.isStopped = false;
     }
 
     public void GotSelected()
     {
-        _renderer.material = OutlinedMaterial;
+        _renderer.materials[0] = OutlinedMaterial;
         IconObject.SelectionBox.SetActive(true);
         _selected = true;
     }
 
     public void GotDeselected()
     {
-        _renderer.material = _defaultMaterial;
+        _renderer.materials[0] = _defaultMaterial;
         IconObject.SelectionBox.SetActive(false);
         _selected = false;
     }
@@ -254,6 +255,7 @@ public abstract class Bender : MonoBehaviour
         _audioSource.PlayOneShot(AbilitySound);
         State = States.Idle;
         BenderAnimator.SetBool("Ability", false);
+        NavAgent.isStopped = false;
     }
 
     public void FootstepSound()

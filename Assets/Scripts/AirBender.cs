@@ -45,8 +45,8 @@ public class AirBender : Bender
                 FinishCast();
                 break;
             case States.Casting2:
-                AirPush projectilePush = Instantiate(AirPushPrefab, ProjectileSpawnPoint.position, 
-                    new Quaternion()).GetComponent<AirPush>();
+                Push projectilePush = Instantiate(AirPushPrefab, ProjectileSpawnPoint.position, 
+                    new Quaternion()).GetComponent<Push>();
                 projectilePush.SetDirection(transform.forward);
                 FinishCast();
                 break;

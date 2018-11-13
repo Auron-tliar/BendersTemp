@@ -114,8 +114,11 @@ public class HumanController : PlayerController
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100f, MovementLayer))
             {
                 Instantiate(ClickMark, hit.point, new Quaternion());
-                _selection.NavAgent.isStopped = false;
-                _selection.NavAgent.SetDestination(hit.point);
+                if (!_selection.NavAgent.isStopped)
+                {
+                    _selection.NavAgent.SetDestination(hit.point);
+                }
+                //_selection.NavAgent.isStopped = false;
             }
         }
     }
