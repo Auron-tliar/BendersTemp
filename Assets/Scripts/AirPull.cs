@@ -16,7 +16,7 @@ public class AirPull : Projectile
             {
                 bender.NavAgent.isStopped = true;
             }
-            collider.attachedRigidbody.AddForce(-_rigidbody.velocity * Power);
+            collider.attachedRigidbody.AddForce(-_rigidbody.velocity * Power * bender.getVulnerability());
             bender.GotHit();
             PlayHitSound(bender.AudioSourcePlayer);
             Destroy(gameObject);

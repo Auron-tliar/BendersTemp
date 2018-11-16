@@ -71,6 +71,8 @@ public abstract class Bender : MonoBehaviour
 
     protected float _rotation;
 
+    protected float _vulnerability;
+
     public BenderIconController IconObject
     {
         get
@@ -126,6 +128,7 @@ public abstract class Bender : MonoBehaviour
 
     protected void Start()
     {
+        _vulnerability = 1.0f;
         _rotation = transform.rotation.eulerAngles.y;
     }
 
@@ -219,6 +222,7 @@ public abstract class Bender : MonoBehaviour
 
     public void GotHit()
     {
+        _vulnerability += 0.05f;
         BenderAnimator.SetTrigger("Hit");
         State = States.Recovering;
         BenderAnimator.SetBool("Moving", false);
@@ -283,5 +287,10 @@ public abstract class Bender : MonoBehaviour
             }
         }
         Destroy(gameObject);
+    }
+
+    public float getVulnerability()
+    {
+        return _vulnerability;
     }
 }
