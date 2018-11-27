@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FireBender : Bender
 {
-    public Transform ProjectileSpawnPoint;
     //public GameObject WaterPushPrefab;
 
     private float _startTime;

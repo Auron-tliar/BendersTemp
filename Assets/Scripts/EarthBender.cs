@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EarthBender : Bender
 {
-    public Transform ProjectileSpawnPoint;
     //public GameObject WaterPushPrefab;
 
     private float _startTime;

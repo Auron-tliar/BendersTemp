@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class AirBender : Bender
 {
-    public Transform ProjectileSpawnPoint;
     public float SpeedBuffSpeed = 8f;
     public float SpeedBuffDuration = 10f;
     public ParticleSystem BuffParticleSystem;
@@ -45,14 +44,14 @@ public class AirBender : Bender
                 FinishCast();
                 break;
             case States.Casting2:
-                Push projectilePush = Instantiate(AirPushPrefab, ProjectileSpawnPoint.position, 
-                    new Quaternion()).GetComponent<Push>();
+                Projectile projectilePush = Instantiate(AirPushPrefab, ProjectileSpawnPoint.position, 
+                    new Quaternion()).GetComponent<Projectile>();
                 projectilePush.SetDirection(transform.forward);
                 FinishCast();
                 break;
             case States.Casting3:
-                AirPull projectilePull = Instantiate(AirPullPrefab, ProjectileSpawnPoint.position,
-                    new Quaternion()).GetComponent<AirPull>();
+                Projectile projectilePull = Instantiate(AirPullPrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
                 projectilePull.SetDirection(transform.forward);
                 FinishCast();
                 break;
