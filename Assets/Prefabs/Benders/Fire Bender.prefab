@@ -2181,6 +2181,7 @@ MonoBehaviour:
   StandardSpeed: 5
   StandardRotationSpeed: 120
   AbilityNumber: 3
+  ProjectileSpawnPoint: {fileID: 4488496448898142}
   AbilitiesPS:
   - {fileID: 198503191670332034}
   - {fileID: 198068947800849168}
@@ -2188,6 +2189,7 @@ MonoBehaviour:
   Nameplate: {fileID: 114655368265799442}
   MeshChild: {fileID: 1751265782020606}
   OutlinedMaterial: {fileID: 2100000, guid: 807991902479ae44eb214f7902ecc493, type: 2}
+  FrozenMaterial: {fileID: 2100000, guid: 35cb28c46a4dbab4eb8a3e514cd93063, type: 2}
   Base: {fileID: 1940177947713460}
   Footsteps:
   - {fileID: 8300000, guid: c88f941f0652e8048be78e94b6879648, type: 3}
@@ -2208,7 +2210,6 @@ MonoBehaviour:
   RotationSpeedInput: 0
   AbilitySelector: -1
   NavAgent: {fileID: 0}
-  ProjectileSpawnPoint: {fileID: 4488496448898142}
 --- !u!136 &136839544000872600
 CapsuleCollider:
   m_ObjectHideFlags: 1

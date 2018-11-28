@@ -13,7 +13,8 @@ public abstract class Bender : MonoBehaviour
         Casting1,
         Casting2,
         Casting3,
-        Recovering
+        Recovering,
+        Frozen
     }
 
     public enum BenderTypes
@@ -33,11 +34,14 @@ public abstract class Bender : MonoBehaviour
     public float StandardRotationSpeed = 120f;
     public int AbilityNumber = 3;
 
+    public Transform ProjectileSpawnPoint;
+
     public List<ParticleSystem> AbilitiesPS;
 
     public TextMeshPro Nameplate;
     public GameObject MeshChild;
     public Material OutlinedMaterial;
+    public Material FrozenMaterial;
     public GameObject Base;
 
 
@@ -72,6 +76,8 @@ public abstract class Bender : MonoBehaviour
     protected float _rotation;
 
     protected float _vulnerability;
+
+    protected Material _prevMaterial;
 
     public BenderIconController IconObject
     {
@@ -203,7 +209,10 @@ public abstract class Bender : MonoBehaviour
 
     public void StartAbility(States state, int number)
     {
-        NavAgent.isStopped = true;
+        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        {
+            NavAgent.isStopped = true;
+        }
         BenderAnimator.SetBool("Ability", true);
         State = state;
         AbilitiesPS[number].Play();
@@ -225,7 +234,10 @@ public abstract class Bender : MonoBehaviour
         BenderAnimator.SetTrigger("Hit");
         State = States.Recovering;
         BenderAnimator.SetBool("Moving", false);
-        NavAgent.isStopped = true;
+        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        {
+            NavAgent.isStopped = true;
+        }
     }
 
     public void GotRevived()
@@ -236,19 +248,22 @@ public abstract class Bender : MonoBehaviour
     public void Recovered()
     {
         State = States.Idle;
-        NavAgent.isStopped = false;
+        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        {
+            NavAgent.isStopped = false;
+        }
     }
 
     public void GotSelected()
     {
-        _renderer.materials[0] = OutlinedMaterial;
+        _renderer.material = OutlinedMaterial;
         IconObject.SelectionBox.SetActive(true);
         _selected = true;
     }
 
     public void GotDeselected()
     {
-        _renderer.materials[0] = _defaultMaterial;
+        _renderer.material = _defaultMaterial;
         IconObject.SelectionBox.SetActive(false);
         _selected = false;
     }
@@ -258,7 +273,37 @@ public abstract class Bender : MonoBehaviour
         _audioSource.PlayOneShot(AbilitySound);
         State = States.Idle;
         BenderAnimator.SetBool("Ability", false);
-        NavAgent.isStopped = false;
+        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        {
+            NavAgent.isStopped = false;
+        }
+    }
+
+    public void GotFrozen(float freezeDuration)
+    {
+        _prevMaterial = _renderer.material;
+        _renderer.material = FrozenMaterial;
+        BenderAnimator.speed = 0f;
+        State = States.Frozen;
+
+        StartCoroutine(Unfreeze(freezeDuration));
+    }
+
+    protected IEnumerator Unfreeze(float freezeDuration)
+    {
+        yield return new WaitForSeconds(freezeDuration);
+        if (State == States.Frozen)
+        {
+            GotUnfrozen();
+        }
+    }
+
+    public void GotUnfrozen()
+    {
+        _renderer.material = _prevMaterial;
+        BenderAnimator.speed = 1f;
+        BenderAnimator.SetTrigger("Reset");
+        Recovered();
     }
 
     public void FootstepSound()

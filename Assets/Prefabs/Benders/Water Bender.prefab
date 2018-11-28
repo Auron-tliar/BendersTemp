@@ -1089,7 +1089,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1435051400598430}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.5, z: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: 1.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4233123218964990}
@@ -2068,6 +2068,7 @@ MonoBehaviour:
   StandardSpeed: 5
   StandardRotationSpeed: 120
   AbilityNumber: 3
+  ProjectileSpawnPoint: {fileID: 4128193301369402}
   AbilitiesPS:
   - {fileID: 198651572094718450}
   - {fileID: 198626471577350690}
@@ -2075,6 +2076,7 @@ MonoBehaviour:
   Nameplate: {fileID: 114822063191562856}
   MeshChild: {fileID: 1661785110517726}
   OutlinedMaterial: {fileID: 2100000, guid: dccfe3cdca2af5145b115910f3d145dd, type: 2}
+  FrozenMaterial: {fileID: 2100000, guid: 35cb28c46a4dbab4eb8a3e514cd93063, type: 2}
   Base: {fileID: 1809557735023740}
   Footsteps:
   - {fileID: 8300000, guid: 18f1ff003e8fbdb44aba8266f6e1d168, type: 3}
@@ -2095,7 +2097,10 @@ MonoBehaviour:
   RotationSpeedInput: 0
   AbilitySelector: -1
   NavAgent: {fileID: 0}
-  ProjectileSpawnPoint: {fileID: 4128193301369402}
+  WaterPushPrefab: {fileID: 1984157427519418, guid: 704cb4d43f90c594587174568f9cc4d2,
+    type: 2}
+  WaterFreezePrefab: {fileID: 1984157427519418, guid: 11b6b7b10c1a1d74aaa5b42a0b09575b,
+    type: 2}
 --- !u!114 &114822063191562856
 MonoBehaviour:
   m_ObjectHideFlags: 1

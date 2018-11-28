@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class WaterBender : Bender
 {
-    public Transform ProjectileSpawnPoint;
-    //public GameObject WaterPushPrefab;
+    public GameObject WaterPushPrefab;
+    public GameObject WaterFreezePrefab;
 
     private float _startTime;
 
@@ -29,6 +29,28 @@ public class WaterBender : Bender
 
     protected override void Cast()
     {
-        throw new System.NotImplementedException();
+        switch (State)
+        {
+            case States.Casting1:
+                Projectile projectilePush = Instantiate(WaterPushPrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectilePush.SetDirection(transform.forward);
+                FinishCast();
+                break;
+            case States.Casting2:
+                Projectile projectileFreeze = Instantiate(WaterFreezePrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectileFreeze.SetDirection(transform.forward);
+                FinishCast();
+                break;
+            case States.Casting3:
+
+                // !!!!!!!!!!! Recover !!!!!!!!!!!!!!!! //
+
+                FinishCast();
+                break;
+            default:
+                break;
+        }
     }
 }
