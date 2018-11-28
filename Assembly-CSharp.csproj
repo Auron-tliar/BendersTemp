@@ -181,7 +181,6 @@
     <Compile Include="Assets\Scripts\SelfDestruct.cs" />
     <Compile Include="Assets\Scripts\TextMirror.cs" />
     <Compile Include="Assets\Scripts\WaterBender.cs" />
-    <Compile Include="Assets\Scripts\WaterFreeze.cs" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Shaders\OutlinedShader.shader" />
