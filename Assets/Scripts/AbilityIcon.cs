@@ -15,6 +15,11 @@ public class AbilityIcon : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        HumanControllerMouse hc = BoundBender.Owner.GetComponent<HumanControllerMouse>();
+        if (hc == null)
+        {
+            return;
+        }
         if(BoundBender.State != Bender.States.Idle && BoundBender.State != Bender.States.Moving)
         {
             return;
@@ -34,6 +39,9 @@ public class AbilityIcon : MonoBehaviour, IPointerClickHandler
             default:
                 break;
         }
-        BoundBender.Owner.GetComponent<HumanController>().ClickHandled = true;
+
+        
+         hc.ClickHandled = true;
+       
     }
 }

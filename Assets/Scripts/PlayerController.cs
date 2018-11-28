@@ -6,7 +6,8 @@ public abstract class PlayerController : MonoBehaviour
 {
     public enum PlayerTypes
     {
-        Human,
+        HumanMouse,
+        HumanKeyBoard,
         AI
     }
 
@@ -18,7 +19,7 @@ public abstract class PlayerController : MonoBehaviour
 
     public GameObject IconPrefab;
 
-    private void Start()
+    protected void Start()
     {
         for (int i = 0; i < transform.childCount; i++)
         {
@@ -27,7 +28,7 @@ public abstract class PlayerController : MonoBehaviour
             BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
             icon.DependentBender = bender;
             bender.IconObject = icon;
-            if (Type == PlayerTypes.AI)
+            if (Type != PlayerTypes.HumanMouse)
             {
                 bender.NavAgent.enabled = false;
             }

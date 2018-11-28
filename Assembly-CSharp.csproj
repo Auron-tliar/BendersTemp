@@ -169,6 +169,9 @@
     <Compile Include="Assets\Scripts\FallZone.cs" />
     <Compile Include="Assets\Scripts\FireBender.cs" />
     <Compile Include="Assets\Scripts\HumanController.cs" />
+    <Compile Include="Assets\Scripts\HumanControllerKeyBoard.cs" />
+    <Compile Include="Assets\Scripts\HumanControllerMouse.cs" />
+    <Compile Include="Assets\Scripts\Panels.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\PlayerControls.cs" />
     <Compile Include="Assets\Scripts\Projectile.cs" />

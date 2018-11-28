@@ -139,8 +139,7 @@ public abstract class Bender : MonoBehaviour
         {
             return;
         }
-
-        if (Owner.Type == PlayerController.PlayerTypes.Human)
+        if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             if (_selected)
             {
@@ -188,8 +187,8 @@ public abstract class Bender : MonoBehaviour
             _rigidbody.velocity = transform.forward * SpeedInput * StandardSpeed;
         }
         
-        if ((Owner.Type == PlayerController.PlayerTypes.AI && Mathf.Abs(SpeedInput) > 0.01) ||
-            (Owner.Type == PlayerController.PlayerTypes.Human && NavAgent.velocity.magnitude > 0.01))
+        if (((Owner.Type == PlayerController.PlayerTypes.AI || Owner.Type == PlayerController.PlayerTypes.HumanKeyBoard) && Mathf.Abs(SpeedInput) > 0.01) ||
+            ((Owner.Type == PlayerController.PlayerTypes.HumanMouse) && NavAgent.velocity.magnitude > 0.01))
         {
             BenderAnimator.SetBool("Moving", true);
             State = States.Moving;
@@ -278,9 +277,9 @@ public abstract class Bender : MonoBehaviour
     public void Defeat()
     {
         IconObject.RemovedMask.SetActive(true);
-        if (Owner.Type == PlayerController.PlayerTypes.Human)
+        if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
-            HumanController hc = Owner.GetComponent<HumanController>();
+            HumanControllerMouse hc = Owner.GetComponent<HumanControllerMouse>();
             if (hc.Selection == this)
             {
                 hc.Selection = null;
@@ -292,5 +291,10 @@ public abstract class Bender : MonoBehaviour
     public float getVulnerability()
     {
         return _vulnerability;
+    }
+
+    public bool isSelected()
+    {
+        return _selected;
     }
 }

@@ -43,9 +43,9 @@ public class BenderIconController : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (_dependentBender.Owner.Type == PlayerController.PlayerTypes.Human)
+        if (_dependentBender.Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
-            HumanController hc = _dependentBender.Owner.GetComponent<HumanController>();
+            HumanControllerMouse hc = _dependentBender.Owner.GetComponent<HumanControllerMouse>();
             hc.Selection = _dependentBender;
             hc.ClickHandled = true;
         }

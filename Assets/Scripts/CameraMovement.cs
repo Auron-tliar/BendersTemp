@@ -9,20 +9,65 @@ public class CameraMovement : MonoBehaviour
     public float RotationSpeed = 100f;
     public float ScrollSpeed = 100f;
 
-	void Update ()
-    {
-        transform.position += (transform.forward * Input.GetAxis("Vertical") +
-            transform.right * Input.GetAxis("Horizontal")) * MovementSpeed * Time.deltaTime -
-            transform.up * Input.GetAxis("Mouse ScrollWheel") * ScrollSpeed;
-        transform.position = new Vector3(Mathf.Clamp(transform.position.x, Bounds.XMin, Bounds.XMax),
-            Mathf.Clamp(transform.position.y, Bounds.YMin, Bounds.YMax),
-            Mathf.Clamp(transform.position.z, Bounds.ZMin, Bounds.ZMax));
-        /*transform.position = new Vector3(Mathf.Clamp(transform.position.x + Input.GetAxis("Horizontal") * MovementSpeed *
-            Time.deltaTime, Bounds.XMin, Bounds.XMax), transform.position.y, 
-            Mathf.Clamp(transform.position.z + Input.GetAxis("Vertical") * MovementSpeed * Time.deltaTime,
-            Bounds.ZMin, Bounds.ZMax));*/
+    public List<GameObject> benders = new List<GameObject>();
+    public Vector3 offset;
+    public float smoothFactor = 0.5f;
 
-        transform.Rotate(new Vector3(0f, Input.GetAxis("Rotation") * RotationSpeed * Time.deltaTime, 0f));
+
+    private Vector3 velocity;
+
+    void LateUpdate ()
+    {
+        if (benders.Count == 0)
+        {
+            return;
+        }
+
+        Move();
+    }
+
+    float GetGreatestDistance()
+    {
+        Bounds b = GetBounds();
+        if(b.size.x < b.size.y)
+        {
+            return b.size.y;
+        }
+        else
+        {
+            return b.size.x;
+        }
+
+    }
+
+    void Move()
+    {
+        Vector3 centerPoint = GetCenterPoint();
+
+        Vector3 newPosition = centerPoint + offset;
+
+        transform.position = Vector3.SmoothDamp(transform.position, newPosition, ref velocity, smoothFactor);
+    }
+
+    Vector3 GetCenterPoint()
+    {
+        if(benders.Count == 1)
+        {
+            return benders[0].transform.position;
+        }
+ 
+        return GetBounds().center;
+    }
+
+    Bounds GetBounds()
+    {
+        var bounds = new Bounds(benders[0].transform.position, Vector3.zero);
+        for (int i = 0; i < benders.Count; i++)
+        {
+          
+            bounds.Encapsulate(benders[i].transform.position);
+        }
+        return bounds;
     }
 }
 
