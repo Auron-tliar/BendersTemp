@@ -275,7 +275,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 79743675}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1caa0cb5cd98aed44bc4045ffe1e98d2, type: 3}
+  m_Script: {fileID: 11500000, guid: 72bbc9d07ce7d17489078c0040aacfb8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   AirBenderAbilityPanel: {fileID: 1744268815}
@@ -774,7 +774,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 389458429}
-  - component: {fileID: 389458430}
+  - component: {fileID: 389458428}
   m_Layer: 0
   m_Name: Player 1 Container
   m_TagString: Player1
@@ -782,6 +782,31 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &389458428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 389458427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1141fa44e0637884f8297ba2243259e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 0
+  PlayerColor: {r: 0.3334236, g: 1, b: 0, a: 1}
+  UIIconContainer: {fileID: 2000514214}
+  BendersTeam: []
+  IconPrefab: {fileID: 1149386753920882, guid: 9fd880d78c230b84bbf957087c620b93, type: 2}
+  panels: {fileID: 79743675}
+  SelectionLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  MovementLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  ClickMark: {fileID: 1906187923268370, guid: a25edc3648cc91c4596858c5a10a8e13, type: 2}
+  ClickHandled: 0
 --- !u!4 &389458429
 Transform:
   m_ObjectHideFlags: 0
@@ -796,31 +821,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &389458430
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 389458427}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce9fc6da2caacea489a5c3103110a3c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Type: 0
-  PlayerColor: {r: 1, g: 0, b: 0, a: 1}
-  UIIconContainer: {fileID: 2000514214}
-  BendersTeam: []
-  IconPrefab: {fileID: 1149386753920882, guid: 9fd880d78c230b84bbf957087c620b93, type: 2}
-  panels: {fileID: 79743675}
-  SelectionLayer:
-    serializedVersion: 2
-    m_Bits: 512
-  MovementLayer:
-    serializedVersion: 2
-    m_Bits: 1024
-  ClickMark: {fileID: 1906187923268370, guid: a25edc3648cc91c4596858c5a10a8e13, type: 2}
-  ClickHandled: 0
 --- !u!1 &393709538
 GameObject:
   m_ObjectHideFlags: 0
@@ -2177,6 +2177,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1186855108}
   - component: {fileID: 1186855107}
+  - component: {fileID: 1186855109}
   m_Layer: 0
   m_Name: Player 3 Container
   m_TagString: Player1
@@ -2195,15 +2196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c56426888dce1943bd9caef6701cd45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 1
-  PlayerColor: {r: 0.21461558, g: 1, b: 0, a: 1}
-  UIIconContainer: {fileID: 2000514214}
-  BendersTeam: []
-  IconPrefab: {fileID: 1149386753920882, guid: 9fd880d78c230b84bbf957087c620b93, type: 2}
-  panels: {fileID: 79743675}
-  speed: 5
-  rotationSpeed: 30
-  bender: {fileID: 1408561422}
 --- !u!4 &1186855108
 Transform:
   m_ObjectHideFlags: 0
@@ -2218,6 +2210,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1186855109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1186855106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6e28562e58194a4d811fe3aebd30295, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Type: 1
+  PlayerColor: {r: 0, g: 0, b: 1, a: 1}
+  UIIconContainer: {fileID: 2000514214}
+  BendersTeam: []
+  IconPrefab: {fileID: 1149386753920882, guid: 9fd880d78c230b84bbf957087c620b93, type: 2}
+  panels: {fileID: 79743675}
+  speed: 3
+  rotationSpeed: 100
+  bender: {fileID: 1408561422}
 --- !u!4 &1203118324 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4136295902764076, guid: 305b156204f667549baa85f1cc4c22e2,

@@ -209,7 +209,7 @@ public abstract class Bender : MonoBehaviour
 
     public void StartAbility(States state, int number)
     {
-        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             NavAgent.isStopped = true;
         }
@@ -234,7 +234,7 @@ public abstract class Bender : MonoBehaviour
         BenderAnimator.SetTrigger("Hit");
         State = States.Recovering;
         BenderAnimator.SetBool("Moving", false);
-        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             NavAgent.isStopped = true;
         }
@@ -248,7 +248,7 @@ public abstract class Bender : MonoBehaviour
     public void Recovered()
     {
         State = States.Idle;
-        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             NavAgent.isStopped = false;
         }
@@ -273,7 +273,7 @@ public abstract class Bender : MonoBehaviour
         _audioSource.PlayOneShot(AbilitySound);
         State = States.Idle;
         BenderAnimator.SetBool("Ability", false);
-        if (_owner.Type == PlayerController.PlayerTypes.Human)
+        if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             NavAgent.isStopped = false;
         }
