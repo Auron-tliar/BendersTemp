@@ -240,6 +240,11 @@ public abstract class Bender : MonoBehaviour
         }
     }
 
+    public bool IsHit()
+    {
+        return !BenderAnimator.GetBool("Moving");
+    }
+
     public void GotRevived()
     {
         BenderAnimator.SetTrigger("Revive");

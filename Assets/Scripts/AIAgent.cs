@@ -62,34 +62,39 @@ public class AIAgent : Agent {
             AddReward(100);
         }
 
-        //if(bender.GotHit())
-        //{
-        //    AddReward(-1f);
-        //}
+        if (bender.IsHit())
+        {
+            AddReward(-1f);
+        }
 
-        //if(bender.GotDefeated())
-        //{
-        //    Done();
-        //    AddReward(-100f);
-        //}
+        if (bender == null)
+        {
+            Done();
+            AddReward(-100f);
+        }
 
 
         // Perform actions
         if (bender.State != Bender.States.Idle && bender.State != Bender.States.Moving)
         {
+            // Penalize if choosing action in wrong state
+            AddReward(-1);
             return;
         }
 
         if (vectorAction[0] == 1)
         {
+            AddReward(2);
             bender.StartAbility(Bender.States.Casting1, 0);
         }
         else if (vectorAction[1] == 1)
         {
+            AddReward(2);
             bender.StartAbility(Bender.States.Casting2, 1);
         }
         else if (vectorAction[2] == 1)
         {
+            AddReward(2);
             bender.StartAbility(Bender.States.Casting3, 2);
         }
 
