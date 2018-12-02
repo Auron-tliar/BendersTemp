@@ -3,6 +3,8 @@ from gym_unity.envs import UnityEnv
 import numpy as np
 from tensorflow.python.tools import freeze_graph
 
+from DQNAgent import DQNAgent
+
 
 def export_graph(sess):
     model_path = 'model'
@@ -34,12 +36,17 @@ def main():
     observation_size = len(env.observation_space.low)
     action_size = len(env.action_space.low)
 
+    minibatch_size = 32
+
+    # agent = DQNAgent('a', observation_size, action_size, minibatch_size)
+
     input, output = build_model(observation_size, action_size)
 
     excpected_value = tf.placeholder(shape=[None, action_size], dtype=tf.float32)
 
-    cost = tf.reduce_mean((output - excpected_value) ** 2)
-    optimizer = tf.train.RMSPropOptimizer(0.01).minimize(cost)
+    loss = tf.losses.mean_squared_error(output, excpected_value)
+
+    optimizer = tf.train.RMSPropOptimizer(0.01).minimize(loss)
 
     saver = tf.train.Saver()
 
@@ -52,7 +59,7 @@ def main():
         reward_vec = np.zeros(action_size)
 
         for step in range(1000):
-            _, val, action_vec = sess.run([optimizer, cost, output],
+            _, val, action_vec = sess.run([optimizer, loss, output],
                                           feed_dict={input: observation.reshape(-1, observation_size),
                                                      excpected_value: reward_vec.reshape(-1, action_size)})
 
