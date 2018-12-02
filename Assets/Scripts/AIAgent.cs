@@ -23,6 +23,8 @@ public class AIAgent : Agent {
         int height = terrain.terrainData.heightmapHeight;
         Vector3 sampleScale = terrain.terrainData.heightmapScale;
 
+        AddVectorObs(new float[] { width, height });
+
         if (false)
         {
             float[,] heights = terrain.terrainData.GetHeights(0, 0, width, height);

@@ -543,19 +543,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &261077616
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 943466ab374444748a364f9d6c3e2fe2, type: 3}
-  m_Name: (Clone)(Clone)(Clone)
-  m_EditorClassIdentifier: 
-  broadcast: 1
-  brain: {fileID: 1320492598}
 --- !u!4 &268505289 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4225799983190604, guid: 31a93e8bd24845344b027a5f37b666ad,
@@ -848,6 +835,19 @@ Transform:
   m_Father: {fileID: 52222289}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &412016561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 943466ab374444748a364f9d6c3e2fe2, type: 3}
+  m_Name: (Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  broadcast: 1
+  brain: {fileID: 1320492598}
 --- !u!1 &443634378
 GameObject:
   m_ObjectHideFlags: 0
@@ -1287,29 +1287,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 224012362231904950, guid: dd535af50d8f6f74da5ce9f47da89603,
     type: 2}
   m_PrefabInternal: {fileID: 608796240}
---- !u!114 &609377558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b23992c8eb17439887f5e944bf04a40, type: 3}
-  m_Name: (Clone)(Clone)(Clone)
-  m_EditorClassIdentifier: 
-  broadcast: 1
-  graphModel: {fileID: 0}
-  graphScope: 
-  graphPlaceholders: []
-  BatchSizePlaceholderName: batch_size
-  VectorObservationPlacholderName: vector_observation
-  RecurrentInPlaceholderName: recurrent_in
-  RecurrentOutPlaceholderName: recurrent_out
-  VisualObservationPlaceholderName: []
-  ActionPlaceholderName: action
-  PreviousActionPlaceholderName: prev_action
-  brain: {fileID: 1320492598}
 --- !u!1 &609436224
 GameObject:
   m_ObjectHideFlags: 0
@@ -1464,6 +1441,34 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4225799983190604, guid: 31a93e8bd24845344b027a5f37b666ad,
     type: 2}
   m_PrefabInternal: {fileID: 764488907}
+--- !u!114 &732261378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41e9bda8f3cf1492fa74926a530f6f70, type: 3}
+  m_Name: (Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  broadcast: 1
+  keyContinuousPlayerActions: []
+  axisContinuousPlayerActions: []
+  discretePlayerActions:
+  - key: 49
+    branchIndex: 0
+    value: 1
+  - key: 50
+    branchIndex: 1
+    value: 1
+  - key: 51
+    branchIndex: 2
+    value: 1
+  - key: 52
+    branchIndex: 3
+    value: 1
+  brain: {fileID: 1320492598}
 --- !u!1 &738545166
 GameObject:
   m_ObjectHideFlags: 0
@@ -1599,18 +1604,6 @@ Transform:
   m_Father: {fileID: 117665090}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &847420723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35813a1be64e144f887d7d5f15b963fa, type: 3}
-  m_Name: (Clone)(Clone)(Clone)
-  m_EditorClassIdentifier: 
-  brain: {fileID: 1320492598}
 --- !u!1 &891463488
 GameObject:
   m_ObjectHideFlags: 0
@@ -2320,7 +2313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brainParameters:
-    vectorObservationSize: 0
+    vectorObservationSize: 2
     numStackedVectorObservations: 1
     vectorActionSize: 08000000
     cameraResolutions: []
@@ -2334,13 +2327,13 @@ MonoBehaviour:
     - 
     - 
     vectorActionSpaceType: 1
-  brainType: 1
+  brainType: 2
   CoreBrains:
-  - {fileID: 1322446802}
-  - {fileID: 261077616}
-  - {fileID: 847420723}
-  - {fileID: 609377558}
-  instanceID: 14526
+  - {fileID: 732261378}
+  - {fileID: 412016561}
+  - {fileID: 1364113079}
+  - {fileID: 1978042722}
+  instanceID: 56180
 --- !u!114 &1320492599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2352,34 +2345,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67264e06e07fb40d8939b0860ebee773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1322446802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41e9bda8f3cf1492fa74926a530f6f70, type: 3}
-  m_Name: (Clone)(Clone)(Clone)
-  m_EditorClassIdentifier: 
-  broadcast: 1
-  keyContinuousPlayerActions: []
-  axisContinuousPlayerActions: []
-  discretePlayerActions:
-  - key: 49
-    branchIndex: 0
-    value: 1
-  - key: 50
-    branchIndex: 1
-    value: 1
-  - key: 51
-    branchIndex: 2
-    value: 1
-  - key: 52
-    branchIndex: 3
-    value: 1
-  brain: {fileID: 1320492598}
 --- !u!1 &1344143003
 GameObject:
   m_ObjectHideFlags: 0
@@ -2412,6 +2377,18 @@ Transform:
   m_Father: {fileID: 2044910652}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1364113079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35813a1be64e144f887d7d5f15b963fa, type: 3}
+  m_Name: (Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  brain: {fileID: 1320492598}
 --- !u!1 &1368726779
 GameObject:
   m_ObjectHideFlags: 0
@@ -3679,6 +3656,29 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 224012362231904950, guid: dd535af50d8f6f74da5ce9f47da89603,
     type: 2}
   m_PrefabInternal: {fileID: 1920537418}
+--- !u!114 &1978042722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b23992c8eb17439887f5e944bf04a40, type: 3}
+  m_Name: (Clone)(Clone)(Clone)(Clone)(Clone)
+  m_EditorClassIdentifier: 
+  broadcast: 1
+  graphModel: {fileID: 0}
+  graphScope: 
+  graphPlaceholders: []
+  BatchSizePlaceholderName: batch_size
+  VectorObservationPlacholderName: vector_observation
+  RecurrentInPlaceholderName: recurrent_in
+  RecurrentOutPlaceholderName: recurrent_out
+  VisualObservationPlaceholderName: []
+  ActionPlaceholderName: action
+  PreviousActionPlaceholderName: prev_action
+  brain: {fileID: 1320492598}
 --- !u!1 &2000514213
 GameObject:
   m_ObjectHideFlags: 0
