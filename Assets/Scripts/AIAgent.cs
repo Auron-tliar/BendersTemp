@@ -70,21 +70,23 @@ public class AIAgent : Agent {
             AddReward(100);
         }
 
-        //if(bender.GotHit())
-        //{
-        //    AddReward(-1f);
-        //}
+        if (bender.IsHit())
+        {
+            AddReward(-1f);
+        }
 
-        //if(bender.GotDefeated())
-        //{
-        //    Done();
-        //    AddReward(-100f);
-        //}
+        if (bender == null)
+        {
+            Done();
+            AddReward(-100f);
+        }
 
 
         // Perform actions
         if (bender.State != Bender.States.Idle && bender.State != Bender.States.Moving)
         {
+            // Penalize if choosing action in wrong state
+            AddReward(-1);
             return;
         }
 
