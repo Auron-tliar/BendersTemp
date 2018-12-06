@@ -21,9 +21,9 @@ public abstract class PlayerController : MonoBehaviour
 
     protected void Start()
     {
-        for (int i = 0; i < transform.childCount; i++)
+        var benders = transform.GetComponentsInChildren<Bender>();
+        foreach (var bender in benders)
         {
-            Bender bender = transform.GetChild(i).GetComponent<Bender>();
             bender.Owner = this;
             BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
             icon.DependentBender = bender;
