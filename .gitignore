@@ -8,3 +8,6 @@ Temp/
 obj/
 
 UIElementsSchema/
+
+Build/
+*.csproj
