@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class PlayerController : MonoBehaviour
@@ -21,15 +22,17 @@ public abstract class PlayerController : MonoBehaviour
 
     protected void Start()
     {
-        var benders = transform.GetComponentsInChildren<Bender>();
-        foreach (var bender in benders)
+        List<Bender> benders = GetComponentsInChildren<Bender>().ToList();
+        for (int i = 0; i < benders.Count; i++)
         {
+            Bender bender = benders[i];
             bender.Owner = this;
-            BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
-            icon.DependentBender = bender;
-            bender.IconObject = icon;
-            if (Type != PlayerTypes.HumanMouse)
+
+            if (Type == PlayerTypes.HumanKeyBoard)
             {
+                BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
+                icon.DependentBender = bender;
+                bender.IconObject = icon;
                 bender.NavAgent.enabled = false;
             }
         }

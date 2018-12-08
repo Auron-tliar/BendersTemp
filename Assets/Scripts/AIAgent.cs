@@ -3,7 +3,8 @@ using System.Linq;
 using UnityEngine;
 
 public class AIAgent : Agent {
-    public float downsampleFactor = 0.2f;
+    public static float downsampleFactor = 0.2f;
+    
 
     private Bender bender;
     private Bender[] enemies;
@@ -19,7 +20,7 @@ public class AIAgent : Agent {
         template.gameObject.SetActive(false);
 
         // Find enemy controller
-        AIController[] controllers = GetComponents<AIController>();
+        AIController[] controllers = Component.FindObjectsOfType<AIController>();
         var controller = controllers.First((x) => x != bender.Owner);
         enemies = controller.GetComponentsInChildren<Bender>();
          
@@ -30,57 +31,66 @@ public class AIAgent : Agent {
     public override void AgentReset()
     {
         Debug.Log("Resetting agent " + name);
-        Vector3 newPosition = terrain.terrainData.bounds.center + Vector3.Scale(Random.insideUnitCircle, terrain.terrainData.bounds.extents);
+        Vector3 newPosition = bender.transform.position;
         newPosition.y = terrain.SampleHeight(newPosition);
-       
+
+        var controller = bender.Owner;
+
         // Recreate the bender
         // TODO: Wasteful, should reuse bender if possible
         if (bender != null) Destroy(bender.gameObject);
         bender = Instantiate(template, newPosition, Quaternion.identity, transform);
+        bender.gameObject.SetActive(true);
+        bender.Owner = controller;
 
         // TODO: Dependent on how agent reset is called
         // Find enemy controller
-        AIController[] controllers = GetComponents<AIController>();
-        var controller = controllers.First((x) => x != bender.Owner);
-        enemies = controller.GetComponentsInChildren<Bender>();
+        AIController[] enemyControllers = FindObjectsOfType<AIController>();
+        var enemyController = enemyControllers.First((x) => x != bender.Owner);
+        enemies = enemyController.GetComponentsInChildren<Bender>();
     }
+
 
 
     public override void CollectObservations()
     {
         // Height grid
-        int width = (int) (terrain.terrainData.heightmapWidth * downsampleFactor);
-        int height = (int) (terrain.terrainData.heightmapHeight * downsampleFactor);
+        int width = (int)(terrain.terrainData.heightmapWidth * downsampleFactor);
+        int height = (int)(terrain.terrainData.heightmapHeight * downsampleFactor);
         Vector3 sampleScale = terrain.terrainData.heightmapScale;
+
+
+        // Set observation memory
+        brain.brainParameters.vectorObservationSize = width * height * 2;
+
 
         float[,] heights = terrain.terrainData.GetHeights(0, 0, width, height);
         float[] flattenedHeights = heights.Cast<float>().ToArray();
 
-        if (false)
-        {
-            float[,] heights = terrain.terrainData.GetHeights(0, 0, width, height);
-            float[] flattenedHeights = heights.Cast<float>().ToArray();
+        AddVectorObs(flattenedHeights);
 
-            AddVectorObs(flattenedHeights);
-        }
 
 
         // Enemy grid
-        if (false) { 
-            Vector3 position = terrain.GetPosition();
-            Vector3 size = terrain.terrainData.size;
-            position = position - size/2;
+        Vector3 position = terrain.GetPosition();
 
-            float[] enemyGrid = new float[width * height];
-            if (enemies != null)
-            foreach(var enemy in enemies)
+        float[] enemyGrid = new float[width * height];
+        if (enemies != null)
+        {
+            foreach (var enemy in enemies)
             {
-                Vector3 enemyPosition = enemy.transform.position;
-                enemyPosition -= position;
-            
-            Vector2Int enemySamplePosition = new Vector2Int((int)(enemyPosition.x / sampleScale.x * downsampleFactor), (int)(enemyPosition.z / sampleScale.z * downsampleFactor));
+                if (enemy != null)
+                {
+                    Vector3 enemyPosition = enemy.transform.position;
+                    enemyPosition -= position;
 
-            enemyGrid[enemySamplePosition.x * width + enemySamplePosition.y] += 1;
+                    Vector2Int enemySamplePosition = new Vector2Int((int)(enemyPosition.x / sampleScale.x * downsampleFactor), (int)(enemyPosition.z / sampleScale.z * downsampleFactor));
+
+                    Debug.Log(enemySamplePosition);
+
+                    enemyGrid[enemySamplePosition.x * width + enemySamplePosition.y] += 1;
+                }
+            }
         }
 
         AddVectorObs(enemyGrid);

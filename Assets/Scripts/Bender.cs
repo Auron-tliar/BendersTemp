@@ -145,6 +145,7 @@ public abstract class Bender : MonoBehaviour
         {
             return;
         }
+
         if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             if (_selected)
@@ -335,6 +336,8 @@ public abstract class Bender : MonoBehaviour
                 hc.Selection = null;
             }
         }
+
+        Debug.Log(name + " defeated");
         Destroy(gameObject);
     }
 
