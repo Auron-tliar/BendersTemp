@@ -3,8 +3,9 @@ import numpy as np
 
 
 def create_network(input_vec, num_inputs, num_outputs, name):
-    dense1 = tf.layers.dense(input_vec, 256, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
-    output = tf.layers.dense(dense1, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
+    dense1 = tf.layers.dense(input_vec, 1024, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
+    dense2 = tf.layers.dense(dense1, 256, activation=tf.nn.relu, name="dense2", reuse=tf.AUTO_REUSE)
+    output = tf.layers.dense(dense2, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
 
     #output = tf.identity(output, name="action")
 
@@ -21,7 +22,7 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
 
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.9
+        self.epsilon_decay = 0.995
         self.learning_rate = 0.01
         self.batch_size = batch_size
 

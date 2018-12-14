@@ -31,7 +31,7 @@ def main():
     action_size = len(env.action_space.low)
 
     minibatch_size = 32
-    total_step_count = 2000
+    total_step_count = 3000
 
     agent = DQNAgent('bender_agent', observation_size, action_size, minibatch_size)
 
@@ -52,7 +52,8 @@ def main():
         agents_act_commands = [agent.act(model_input[agent_idx]) for agent_idx in range(num_agents)]
 
         minibatch = tf.placeholder(shape=[minibatch_size, observation_size*2 + 2], dtype=tf.float32, name="history")
-        history_replay_action = agent.replay(minibatch)
+        history_replay_action = list(agent.replay(minibatch))
+        history_replay_action.append(agent.update_epsilon())
 
         history = []  # (-1, observation_size*2 + 2)
 
@@ -81,9 +82,9 @@ def main():
             if step % 10 == 0:
                 if len(history) >= minibatch_size:
                     random_minibatch = np.array(history)[np.random.choice(len(history), size=minibatch_size, replace=False), :]
-                    _, model_loss = sess.run(history_replay_action, feed_dict={minibatch: random_minibatch})
+                    _, model_loss, epsilon = sess.run(history_replay_action, feed_dict={minibatch: random_minibatch})
 
-                    print("step: {}, model_loss: {} reward: {} sel_action: {}".format(step, model_loss, np.mean(rewards), sel_action))
+                    print("step: {}, model_loss: {} reward: {} sel_action: {} epsilon: {}".format(step, model_loss, np.mean(rewards), sel_action, epsilon))
 
                     loss_list.append(model_loss)
 
@@ -91,13 +92,20 @@ def main():
                     print("step: {}, reward: {} sel_action: {}".format(step, np.mean(rewards), sel_action))
 
             if step % 200 == 0 and step > 0:
-                # loss
-                plt.plot(pd.DataFrame(loss_list).rolling(window=5).mean())
-                plt.title('loss step: %d' % (step/10))
-                plt.ylabel('loss')
-                plt.xlabel('step')
-                plt.savefig('results/loss_step_%s.pdf' % (step/10))
-                plt.clf()
+                try:
+                    # loss
+                    plt.plot(pd.DataFrame(loss_list).rolling(window=5).mean())
+                    plt.title('loss step: %d' % (step))
+                    plt.ylabel('loss')
+                    plt.xlabel('step')
+                    plt.savefig('results/loss_step_%s.pdf' % (step))
+                    plt.clf()
+                except:
+                    print('could save plot')
+
+            if step % 300 == 0 and step > 0:
+                observations = env.reset()
+                #history = []
 
         saver.save(sess, 'model/weights')
 
