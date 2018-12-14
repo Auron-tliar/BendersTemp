@@ -2,14 +2,13 @@ import tensorflow as tf
 import numpy as np
 
 
-def create_network(num_inputs, num_outputs, name):
-    input = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32, name="vector_observation")
-    dense1 = tf.layers.dense(input, 32, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
-    output = tf.layers.dense(dense1, num_outputs, activation=None, name="output", reuse=tf.AUTO_REUSE)
+def create_network(input_vec, num_inputs, num_outputs, name):
+    dense1 = tf.layers.dense(input_vec, 256, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
+    output = tf.layers.dense(dense1, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
 
-    output = tf.identity(output, name="action")
+    #output = tf.identity(output, name="action")
 
-    return input, output
+    return output
 
 
 # Deep Q-learning Agent
@@ -26,12 +25,10 @@ class DQNAgent:
         self.learning_rate = 0.01
         self.batch_size = batch_size
 
-        self.qnet = create_network(self.observation_size, self.action_size, 'qnet_' + agent_name)
+        self.qnet = lambda input_vec: create_network(input_vec, self.observation_size, self.action_size, 'qnet_' + agent_name)
 
         # self.qnet_optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate, decay=0.99, epsilon=0.01)
         self.qnet_optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
-
-        self.dummpy_model = self.predict(tf.zeros((1, self.observation_size)))
 
         self.epsilon = tf.Variable(initial_value=tf.constant(0.7), dtype=tf.float32, trainable=False)  # exploration rate
 
@@ -77,13 +74,14 @@ class DQNAgent:
     def act(self, state):
         cond = tf.less_equal(tf.random_uniform(shape=[1]), self.epsilon)[0]
 
-        random_action = lambda: tf.random_uniform(shape=[1], minval=0, maxval=self.action_size, dtype=tf.int32)[0]
+        random_action = lambda: tf.one_hot(tf.random_uniform(shape=[1], minval=0, maxval=self.action_size, dtype=tf.int32)[0], self.action_size)
 
         def prediction_action():
             act_values = self.define_model(self.qnet, tf.reshape(state, (1, -1)), self.observation_size)[0]
             # act_values = tf.Print(act_values, [act_values, tf.argmax(act_values, output_type=tf.int32)], 'act_values')
 
-            return tf.argmax(act_values, output_type=tf.int32)  # returns action
+            # return tf.argmax(act_values, output_type=tf.int32)  # returns action
+            return act_values
 
         return tf.cond(cond, random_action, prediction_action)
 
@@ -93,10 +91,10 @@ class DQNAgent:
     def target_qnet_predict(self, state):
         return self.define_model(self.target_qnet, state, self.observation_size, trainable=False)
 
-    def replay(self, history):
-        random_indexes = tf.random_shuffle(tf.range(history.shape[0]))[:self.batch_size]
+    def replay(self, minibatch):
+        #random_indexes = tf.random_shuffle(tf.range(history.shape[0]))[:self.batch_size]
 
-        minibatch = tf.gather(history, random_indexes)
+        #minibatch = tf.gather(history, random_indexes)
 
         state = minibatch[:, 0:self.observation_size]
         next_state = minibatch[:, self.observation_size:self.observation_size * 2]

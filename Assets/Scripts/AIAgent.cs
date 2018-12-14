@@ -78,7 +78,7 @@ public class AIAgent : Agent {
         }
 
         brain.brainParameters.vectorObservationSize = observationSize;
-        Debug.Log("observationSize:" + observationSize);
+        //Debug.Log("observationSize:" + observationSize);
         //Debug.Log("BenderType:" + (float)bender.BenderType);
 
 
@@ -116,7 +116,7 @@ public class AIAgent : Agent {
     public override void AgentAction(float[] vectorAction, string textAction)
     {
         // Time constraint
-        AddReward(-1);
+        // AddReward(-1);
 
         // Killed all enemies
         if (enemies.Length == 0) {
@@ -146,6 +146,11 @@ public class AIAgent : Agent {
 
         int selectedAction = MaxIndex(vectorAction);
 
+        if (selectedAction == 0)
+            AddReward(-1);
+
+        Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
+
         switch (selectedAction)
         {
             case 1:
@@ -171,7 +176,7 @@ public class AIAgent : Agent {
     private int MaxIndex(float[] array)
     {
         float max = array[0];
-        int maxIndex = 0;
+        int maxIndex = 1;
 
         for (int i = 1; i < array.Length; i++)
         {
