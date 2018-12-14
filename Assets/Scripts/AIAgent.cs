@@ -176,7 +176,7 @@ public class AIAgent : Agent {
     private int MaxIndex(float[] array)
     {
         float max = array[0];
-        int maxIndex = 1;
+        int maxIndex = 0;
 
         for (int i = 1; i < array.Length; i++)
         {
