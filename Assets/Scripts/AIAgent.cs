@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 public class AIAgent : Agent {
-    public static float downsampleFactor = 0.2f;
+    public static float downsampleFactor = 0.1f;
     
 
     private Bender bender;
@@ -11,6 +11,8 @@ public class AIAgent : Agent {
     private Terrain terrain;
 
     private Bender template;
+
+    private bool useTerrainHeights = false;
 
     public override void InitializeAgent()
     {
@@ -61,18 +63,26 @@ public class AIAgent : Agent {
 
 
         // Set observation memory
-        brain.brainParameters.vectorObservationSize = width * height * 2;
+        int observationSize = width * height;
 
+        if (useTerrainHeights)
+        {
+            observationSize += width * height;
+            float[,] heights = terrain.terrainData.GetHeights(0, 0, width, height);
+            float[] flattenedHeights = heights.Cast<float>().ToArray();
 
-        float[,] heights = terrain.terrainData.GetHeights(0, 0, width, height);
-        float[] flattenedHeights = heights.Cast<float>().ToArray();
+            AddVectorObs(flattenedHeights);
+        }
 
-        AddVectorObs(flattenedHeights);
-
+        brain.brainParameters.vectorObservationSize = observationSize;
+        Debug.Log("observationSize:" + observationSize);
 
 
         // Enemy grid
-        Vector3 position = terrain.GetPosition();
+        //Vector3 position = terrain.GetPosition();
+
+        // Subtract the position of the bender to have relative enemy positions
+        Vector3 position = bender.transform.position;
 
         float[] enemyGrid = new float[width * height];
         if (enemies != null)
@@ -84,7 +94,9 @@ public class AIAgent : Agent {
                     Vector3 enemyPosition = enemy.transform.position;
                     enemyPosition -= position;
 
-                    Vector2Int enemySamplePosition = new Vector2Int((int)(enemyPosition.x / sampleScale.x * downsampleFactor), (int)(enemyPosition.z / sampleScale.z * downsampleFactor));
+                    float enemyX = enemyPosition.x / sampleScale.x * downsampleFactor;
+                    float enemyY = enemyPosition.z / sampleScale.z * downsampleFactor;
+                    Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX+width)/2), (int)(enemyY+height)/2);
 
                     Debug.Log(enemySamplePosition);
 
@@ -140,9 +152,9 @@ public class AIAgent : Agent {
             case 3:
                 bender.StartAbility(Bender.States.Casting3, 2); break;
             case 4:
-                bender.SpeedInput = 5f; break;
+                bender.SpeedInput = 2f; break;
             case 5:
-                bender.SpeedInput = -5f; break;
+                bender.SpeedInput = -2f; break;
             case 6:
                 bender.RotationSpeedInput = 5f; break;
             case 7:
