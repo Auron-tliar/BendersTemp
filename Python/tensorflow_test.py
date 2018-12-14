@@ -22,8 +22,9 @@ def export_graph(sess):
 
 def build_model(num_inputs, num_outputs):
     input = tf.placeholder(shape=[None, num_inputs], dtype=tf.float32, name="vector_observation")
-    dense1 = tf.layers.dense(input, 32, activation=tf.nn.relu)
-    output = tf.layers.dense(dense1, num_outputs, activation=None, name="output")
+    dense1 = tf.layers.dense(input, 256, activation=tf.nn.relu)
+    dense2 = tf.layers.dense(dense1, 256, activation=tf.nn.relu)
+    output = tf.layers.dense(dense2, num_outputs, activation=None, name="output")
 
     output = tf.identity(output, name="action")
 
@@ -31,8 +32,9 @@ def build_model(num_inputs, num_outputs):
 
 
 def main():
-    env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False)
+    env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False, multiagent=True)
 
+    observation_header_size = 3
     observation_size = len(env.observation_space.low)
     action_size = len(env.action_space.low)
 
@@ -55,24 +57,34 @@ def main():
     with tf.Session() as sess:
         sess.run(init)
 
-        observation = env.reset()
-        reward_vec = np.zeros(action_size)
+        observations = env.reset()
+
+        num_agents = len(observations)
+
+        print('num_agents: '+str(num_agents))
+        reward_vecs = np.zeros((num_agents, action_size))
 
         for step in range(1000):
-            _, val, action_vec = sess.run([optimizer, loss, output],
-                                          feed_dict={input: observation.reshape(-1, observation_size),
-                                                     excpected_value: reward_vec.reshape(-1, action_size)})
+            reshaped_observation = np.array(observations).reshape(-1, observation_size)
+            # print('reshaped_observation shape: '+str(reshaped_observation.shape))
 
-            observation, reward, done, info = env.step(action_vec)
+            _, val, action_vecs = sess.run([optimizer, loss, output],
+                                          feed_dict={input: reshaped_observation,
+                                                     excpected_value: reward_vecs.reshape(-1, action_size)})
 
-            reward_vec = np.zeros(action_size)
+            action_vecs = list(action_vecs)
+            # print('action_vecs: '+str(action_vecs))
 
-            sel_action = np.argmax(action_vec)
+            observations, rewards, done, info = env.step(action_vecs)
 
-            reward_vec[sel_action] = reward
+            reward_vecs = np.zeros((num_agents, action_size))
+
+            for agent_idx in range(num_agents):
+                sel_action = np.argmax(action_vecs[agent_idx])
+                reward_vecs[agent_idx, sel_action] = rewards[agent_idx]
 
             if step % 10 == 0:
-                print("step: {}, value: {} reward: {} sel_action: {}".format(step, val, reward, sel_action))
+                print("step: {}, value: {} reward: {} sel_action: {}".format(step, val, np.mean(rewards), sel_action))
 
         saver.save(sess, 'model/weights')
 

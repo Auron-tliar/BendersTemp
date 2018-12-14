@@ -63,7 +63,10 @@ public class AIAgent : Agent {
 
 
         // Set observation memory
-        int observationSize = width * height;
+        int observationSize = width * height + 3;
+
+        // add general information header
+        AddVectorObs(new float[] { (float)bender.BenderType, width, height });
 
         if (useTerrainHeights)
         {
@@ -76,10 +79,10 @@ public class AIAgent : Agent {
 
         brain.brainParameters.vectorObservationSize = observationSize;
         Debug.Log("observationSize:" + observationSize);
+        //Debug.Log("BenderType:" + (float)bender.BenderType);
 
 
         // Enemy grid
-        //Vector3 position = terrain.GetPosition();
 
         // Subtract the position of the bender to have relative enemy positions
         Vector3 position = bender.transform.position;
@@ -98,7 +101,7 @@ public class AIAgent : Agent {
                     float enemyY = enemyPosition.z / sampleScale.z * downsampleFactor;
                     Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX+width)/2), (int)(enemyY+height)/2);
 
-                    Debug.Log(enemySamplePosition);
+                    //Debug.Log(enemySamplePosition);
 
                     enemyGrid[enemySamplePosition.x * width + enemySamplePosition.y] += 1;
                 }
