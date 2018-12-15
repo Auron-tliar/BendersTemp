@@ -23,6 +23,34 @@ def export_graph(sess):
                               restore_op_name="save/restore_all", filename_tensor_name="save/Const:0")
 
 
+def plot_observations(observations):
+    # np.set_printoptions(threshold=np.inf)
+
+    for observation in observations:
+        w = int(observation[1])
+        h = int(observation[2])
+        grid = observation[3:].reshape(w, h)
+        # print(np.sum(grid))
+        points_x = []
+        points_y = []
+        # print(grid)
+
+        for y in range(h):
+            for x in range(w):
+                if grid[x, y] > 0:
+                    points_x.append(x-w/2)
+                    points_y.append(y-h/2)
+
+        plt.scatter(points_x, points_y)
+        # print(points_x)
+        # print(points_y)
+
+    plt.xlim((-w/2, w/2))
+    plt.ylim((-h/2, h/2))
+
+    plt.show()
+    plt.clf()
+
 def main():
     env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False, multiagent=True)
 
@@ -30,7 +58,7 @@ def main():
     observation_size = len(env.observation_space.low)
     action_size = len(env.action_space.low)
 
-    minibatch_size = 32
+    minibatch_size = 64
     total_step_count = 3000
 
     agent = DQNAgent('bender_agent', observation_size, action_size, minibatch_size)
@@ -44,6 +72,8 @@ def main():
     with tf.Session() as sess:
 
         observations = env.reset()
+
+        #plot_observations(observations)
 
         num_agents = len(observations)
 
@@ -69,6 +99,8 @@ def main():
             # print('reshaped_observation shape: '+str(reshaped_observation.shape))
 
             action_vecs = sess.run(agents_act_commands, feed_dict={model_input: reshaped_observation})
+            # action_vecs = np.zeros((num_agents, action_size))
+            # action_vecs[:, 6] = 1
 
             action_vecs = list(action_vecs)
             # print('action_vecs: '+str(action_vecs))
@@ -80,6 +112,8 @@ def main():
                 history.append(np.concatenate((observations[agent_idx], new_observations[agent_idx], [sel_action], [rewards[agent_idx]])))
 
             if step % 10 == 0:
+                # plot_observations(new_observations)
+
                 if len(history) >= minibatch_size:
                     random_minibatch = np.array(history)[np.random.choice(len(history), size=minibatch_size, replace=False), :]
                     _, model_loss, epsilon = sess.run(history_replay_action, feed_dict={minibatch: random_minibatch})
@@ -90,6 +124,10 @@ def main():
 
                 else:
                     print("step: {}, reward: {} sel_action: {}".format(step, np.mean(rewards), sel_action))
+
+                # reduce histroy size
+                if len(history) > 500:
+                    history = history[250:]
 
             if step % 200 == 0 and step > 0:
                 try:
@@ -103,7 +141,7 @@ def main():
                 except:
                     print('could save plot')
 
-            if step % 300 == 0 and step > 0:
+            if step % 200 == 0 and step > 0:
                 observations = env.reset()
                 #history = []
 

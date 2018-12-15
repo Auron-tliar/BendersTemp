@@ -3,15 +3,17 @@ using System.Linq;
 using UnityEngine;
 
 public class AIAgent : Agent {
-    public static float downsampleFactor = 0.1f;
+    public static float downsampleFactor = 0.08f;
     
 
     private Bender bender;
     private Bender[] enemies;
+    private AIController enemyController;
     private Terrain terrain;
 
     private Bender template;
 
+    private Vector3 initialPosition;
     private bool useTerrainHeights = false;
 
     public override void InitializeAgent()
@@ -27,13 +29,15 @@ public class AIAgent : Agent {
         enemies = controller.GetComponentsInChildren<Bender>();
          
         terrain = Terrain.activeTerrain;
+
+        initialPosition = bender.transform.position;
     }
 
 
     public override void AgentReset()
     {
         Debug.Log("Resetting agent " + name);
-        Vector3 newPosition = bender.transform.position;
+        Vector3 newPosition = initialPosition; //bender.transform.position;
         newPosition.y = terrain.SampleHeight(newPosition);
 
         var controller = bender.Owner;
@@ -45,11 +49,16 @@ public class AIAgent : Agent {
         bender.gameObject.SetActive(true);
         bender.Owner = controller;
 
+        //bender.transform.position = newPosition;
+        //bender.transform.rotation = Quaternion.identity;
+
         // TODO: Dependent on how agent reset is called
         // Find enemy controller
         AIController[] enemyControllers = FindObjectsOfType<AIController>();
-        var enemyController = enemyControllers.First((x) => x != bender.Owner);
-        enemies = enemyController.GetComponentsInChildren<Bender>();
+        enemyController = enemyControllers.First((x) => x != controller);
+
+        //enemies = enemyController.GetComponentsInChildren<Bender>();
+        enemies = null; // don't set it here because the other controller will delete its benders when resetting the scene
     }
 
 
@@ -78,16 +87,26 @@ public class AIAgent : Agent {
         }
 
         brain.brainParameters.vectorObservationSize = observationSize;
-        //Debug.Log("observationSize:" + observationSize);
+        Debug.Log("observationSize:" + observationSize);
         //Debug.Log("BenderType:" + (float)bender.BenderType);
+        //Debug.Log("width:" + width);
+        //Debug.Log("height:" + height);
 
 
         // Enemy grid
 
         // Subtract the position of the bender to have relative enemy positions
         Vector3 position = bender.transform.position;
+        float y_rotation = bender.transform.rotation.eulerAngles.y;
+
+        Debug.Log("y_rotation:" + y_rotation);
 
         float[] enemyGrid = new float[width * height];
+
+        if (enemies == null) {
+            enemies = enemyController.GetComponentsInChildren<Bender>();
+        }
+
         if (enemies != null)
         {
             foreach (var enemy in enemies)
@@ -97,13 +116,15 @@ public class AIAgent : Agent {
                     Vector3 enemyPosition = enemy.transform.position;
                     enemyPosition -= position;
 
+                    enemyPosition = bender.transform.rotation * enemyPosition;
+
                     float enemyX = enemyPosition.x / sampleScale.x * downsampleFactor;
                     float enemyY = enemyPosition.z / sampleScale.z * downsampleFactor;
                     Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX+width)/2), (int)(enemyY+height)/2);
 
-                    //Debug.Log(enemySamplePosition);
+                    Debug.Log(enemySamplePosition);
 
-                    enemyGrid[enemySamplePosition.x * width + enemySamplePosition.y] += 1;
+                    enemyGrid[enemySamplePosition.x * height + enemySamplePosition.y] += 1;
                 }
             }
         }
@@ -149,7 +170,7 @@ public class AIAgent : Agent {
         if (selectedAction == 0)
             AddReward(-1);
 
-        Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
+        //Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
 
         switch (selectedAction)
         {
