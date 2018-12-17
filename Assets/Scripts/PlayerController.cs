@@ -16,7 +16,7 @@ public abstract class PlayerController : MonoBehaviour
 
     public Color PlayerColor;
     public Transform UIIconContainer;
-    public List<Bender> BendersTeam;
+    //public List<Bender> BendersTeam;
 
     public GameObject IconPrefab;
 
@@ -28,13 +28,13 @@ public abstract class PlayerController : MonoBehaviour
             Bender bender = benders[i];
             bender.Owner = this;
 
-            if (Type == PlayerTypes.HumanKeyBoard)
-            {
-                BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
-                icon.DependentBender = bender;
-                bender.IconObject = icon;
-                bender.NavAgent.enabled = false;
-            }
+            //if (Type == PlayerTypes.HumanKeyBoard)
+            //{
+            BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
+            icon.DependentBender = bender;
+            bender.IconObject = icon;
+            bender.NavAgent.enabled = false;
+            //}
         }
     }
 }
