@@ -79,6 +79,8 @@ public abstract class Bender : MonoBehaviour
 
     protected Material _prevMaterial;
 
+    protected States _frozenPrevState = States.Idle;
+
     public BenderIconController IconObject
     {
         get
@@ -122,6 +124,7 @@ public abstract class Bender : MonoBehaviour
         NavAgent = GetComponent<NavMeshAgent>();
         _rigidbody = GetComponent<Rigidbody>();
         BenderAnimator = GetComponent<Animator>();
+        Name = Names.NamesList[BenderType][Random.Range(0, Names.NamesList[BenderType].Count)];
         Nameplate.text = Name;
         _renderer = MeshChild.GetComponent<Renderer>();
         _defaultMaterial = _renderer.materials[0];
@@ -184,7 +187,7 @@ public abstract class Bender : MonoBehaviour
                     break;
             }
             AbilitySelector = -1;
-            
+
             _rotation += RotationSpeedInput * StandardRotationSpeed * Time.deltaTime;
             _rigidbody.rotation = (Quaternion.Euler(new Vector3(0f, _rotation, 0f)));
             if (_rigidbody.velocity.magnitude <= 0.01 && _rigidbody.velocity.y <= Mathf.Epsilon)
@@ -193,7 +196,7 @@ public abstract class Bender : MonoBehaviour
             }
             _rigidbody.velocity = transform.forward * SpeedInput * StandardSpeed;
         }
-        
+
         if (((Owner.Type == PlayerController.PlayerTypes.AI || Owner.Type == PlayerController.PlayerTypes.HumanKeyBoard) && Mathf.Abs(SpeedInput) > 0.01) ||
             ((Owner.Type == PlayerController.PlayerTypes.HumanMouse) && NavAgent.velocity.magnitude > 0.01))
         {
@@ -232,12 +235,21 @@ public abstract class Bender : MonoBehaviour
     public void GotHit()
     {
         _vulnerability += 0.05f;
-        BenderAnimator.SetTrigger("Hit");
-        State = States.Recovering;
-        BenderAnimator.SetBool("Moving", false);
-        if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
+        if (State != States.Frozen)
         {
-            NavAgent.isStopped = true;
+            BenderAnimator.SetTrigger("Hit");
+            State = States.Recovering;
+            BenderAnimator.SetBool("Moving", false);
+            if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
+            {
+                NavAgent.isStopped = true;
+            }
+        }
+        else
+        {
+            BenderAnimator.SetTrigger("Hit");
+            BenderAnimator.SetBool("Moving", false);
+            _frozenPrevState = States.Recovering;
         }
     }
 
@@ -290,6 +302,7 @@ public abstract class Bender : MonoBehaviour
         _prevMaterial = _renderer.material;
         _renderer.material = FrozenMaterial;
         BenderAnimator.speed = 0f;
+        _frozenPrevState = State;
         State = States.Frozen;
 
         StartCoroutine(Unfreeze(freezeDuration));
@@ -308,8 +321,11 @@ public abstract class Bender : MonoBehaviour
     {
         _renderer.material = _prevMaterial;
         BenderAnimator.speed = 1f;
-        BenderAnimator.SetTrigger("Reset");
-        Recovered();
+        if (_frozenPrevState != States.Recovering)
+        {
+            BenderAnimator.SetTrigger("Reset");
+            Recovered();
+        }
     }
 
     public void FootstepSound()

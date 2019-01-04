@@ -124,7 +124,10 @@ public class AIAgent : Agent {
 
                     Debug.Log(enemySamplePosition);
 
-                    enemyGrid[enemySamplePosition.x * height + enemySamplePosition.y] += 1;
+                    int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
+
+                    if (grid_pos >= 0 && grid_pos < width * height)
+                        enemyGrid[grid_pos] += 1;
                 }
             }
         }
@@ -161,7 +164,7 @@ public class AIAgent : Agent {
         if (bender.State != Bender.States.Idle && bender.State != Bender.States.Moving)
         {
             // Penalize if choosing action in wrong state
-            AddReward(-1);
+            //AddReward(-1);
             return;
         }
 
