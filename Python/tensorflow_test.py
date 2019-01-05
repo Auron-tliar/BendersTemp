@@ -61,7 +61,7 @@ def main():
     action_size = len(env.action_space.low)
 
     minibatch_size = 64
-    total_step_count = 10000
+    total_step_count = 100000
 
     agent = DQNAgent('bender_agent', observation_size, action_size, minibatch_size)
 
@@ -97,6 +97,8 @@ def main():
         if os.path.exists('model/weights.index'):
             saver.restore(sess, 'model/weights')
             print('restored model')
+
+            sess.run(agent.reset_epsilon(0.7))
 
         loss_list = []
 
@@ -158,8 +160,9 @@ def main():
                 except:
                     print('could save plot')
 
-            if step % 200 == 0 and step > 0:
+            if (step % 200 == 0 and step) > 0: #or done:
                 observations = env.reset()
+                print('resetting environment')
                 #history = []
 
             if step % 500 == 0 and step > 0:

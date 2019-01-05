@@ -41,7 +41,7 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
 
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.999
         self.learning_rate = 0.01
         self.batch_size = batch_size
 
@@ -139,6 +139,9 @@ class DQNAgent:
 
     def update_epsilon(self):
         return tf.cond(tf.greater(self.epsilon, self.epsilon_min), lambda: tf.assign(self.epsilon, self.epsilon * self.epsilon_decay), lambda: self.epsilon)
+
+    def reset_epsilon(self, value):
+        return tf.assign(self.epsilon, value)
 
     def get_embeddings(self, states):
         return self.define_model(self.qnet, states, self.observation_size, trainable=False, return_embedding=True)

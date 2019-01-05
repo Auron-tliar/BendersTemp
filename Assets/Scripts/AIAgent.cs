@@ -59,6 +59,7 @@ public class AIAgent : Agent {
 
         //enemies = enemyController.GetComponentsInChildren<Bender>();
         enemies = null; // don't set it here because the other controller will delete its benders when resetting the scene
+
     }
 
 
@@ -94,6 +95,14 @@ public class AIAgent : Agent {
 
 
         // Enemy grid
+        float[] enemyGrid = new float[width * height];
+
+        if (bender.transform == null)
+        {
+            AddVectorObs(enemyGrid);
+            return;
+        }
+
 
         // Subtract the position of the bender to have relative enemy positions
         Vector3 position = bender.transform.position;
@@ -101,7 +110,7 @@ public class AIAgent : Agent {
 
         Debug.Log("y_rotation:" + y_rotation);
 
-        float[] enemyGrid = new float[width * height];
+        
 
         if (enemies == null) {
             enemies = enemyController.GetComponentsInChildren<Bender>();
@@ -139,24 +148,39 @@ public class AIAgent : Agent {
 
     public override void AgentAction(float[] vectorAction, string textAction)
     {
+        SetReward(0);
+
         // Time constraint
         // AddReward(-1);
 
         // Killed all enemies
-        if (enemies.Length == 0) {
+        /*if (enemies.Length == 0) {
             Done();
             AddReward(100);
+        }*/
+
+        foreach (var enemy in enemies)
+        {
+            if (!enemy.IsDefeated() && enemy.IsHit())
+            {
+                AddReward(10);
+            }
+            if (enemy.IsDefeated())
+            {
+                AddReward(100);
+            }
         }
 
-        if (bender.IsHit())
+        if (bender == null || bender.IsDefeated())
+        {
+            //Done();
+            AddReward(-100f);
+        }
+
+
+        if (!bender.IsDefeated() && bender.IsHit())
         {
             AddReward(-1f);
-        }
-
-        if (bender == null)
-        {
-            Done();
-            AddReward(-100f);
         }
 
 
