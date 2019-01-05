@@ -5,9 +5,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from tensorflow.python.tools import freeze_graph
+import pickle
 
 from DQNAgent import DQNAgent
 
+result_dir = 'results'
 
 def export_graph(sess):
     model_path = 'model'
@@ -59,7 +61,7 @@ def main():
     action_size = len(env.action_space.low)
 
     minibatch_size = 64
-    total_step_count = 3000
+    total_step_count = 100000
 
     agent = DQNAgent('bender_agent', observation_size, action_size, minibatch_size)
 
@@ -92,9 +94,26 @@ def main():
         # run dummy model to make sure model_output is used in the graph
         sess.run(model_output, feed_dict={model_input: np.zeros((1, observation_size))})
 
+        if os.path.exists('model/weights.index'):
+            saver.restore(sess, 'model/weights')
+            print('restored model')
+
+            sess.run(agent.reset_epsilon(0.4))
+
         loss_list = []
 
-        for step in range(total_step_count):
+        saved_loss_list_data = [f for f in os.listdir(result_dir) if '.dump' in f]
+        continue_training = len(saved_loss_list_data) > 0
+
+        if continue_training:
+            max_saved = max([(int(d.split('_')[-1].split('.')[0]), d) for d in saved_loss_list_data])
+            print(max_saved)
+            loss_list = pickle.load(open(result_dir+'/'+max_saved[1], 'rb'))
+            min_step = max_saved[0]+1
+        else:
+            min_step = 0
+
+        for step in range(min_step, total_step_count):
             reshaped_observation = np.array(observations).reshape(-1, observation_size)
             # print('reshaped_observation shape: '+str(reshaped_observation.shape))
 
@@ -141,9 +160,16 @@ def main():
                 except:
                     print('could save plot')
 
-            if step % 200 == 0 and step > 0:
+            if (step % 200 == 0 and step) > 0: #or done:
                 observations = env.reset()
+                print('resetting environment')
                 #history = []
+
+            if step % 500 == 0 and step > 0:
+                saver.save(sess, 'model/weights')
+                export_graph(sess)
+
+                pickle.dump(loss_list, open('results/loss_step_%s.dump' % step, 'wb'))
 
         saver.save(sess, 'model/weights')
 

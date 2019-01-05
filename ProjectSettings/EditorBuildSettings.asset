@@ -5,10 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/_Scenes/SampleScene.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 0
+    path: Assets/_Scenes/TrainingCamp.unity
+    guid: 9a9e676c5ac05ed40b5bc3462ee53f50
   - enabled: 1
     path: Assets/_Scenes/Menu.unity
     guid: 1d92daab3961d4543a817affedd31b2e
   - enabled: 1
-    path: Assets/_Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/_Scenes/MatchArena.unity
+    guid: e8ed70305cce0d44d95707ebeaa93c86
   m_configObjects: {}

@@ -1,11 +1,30 @@
+from math import sqrt
+
 import tensorflow as tf
 import numpy as np
 
 
+def Dense(units, activation='relu', name=None):
+    return lambda inputs: tf.layers.dense(inputs, units, activation=activation, kernel_initializer=tf.glorot_uniform_initializer(), name=name, reuse=tf.AUTO_REUSE)
+
+
+def Conv2D(filters, kernel_size, name):
+    return lambda inputs: tf.layers.conv2d(inputs, filters, (kernel_size, kernel_size), activation='relu', kernel_initializer=tf.glorot_uniform_initializer(), name=name, reuse=tf.AUTO_REUSE)
+
+
 def create_network(input_vec, num_inputs, num_outputs, name):
-    dense1 = tf.layers.dense(input_vec, 128, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
-    dense2 = tf.layers.dense(dense1, 128, activation=tf.nn.relu, name="dense2", reuse=tf.AUTO_REUSE)
-    output = tf.layers.dense(dense2, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
+    if True:
+        w = int(sqrt(num_inputs))
+        x = tf.reshape(input_vec[:, 3:], (-1, w, w, 1))
+        x = Conv2D(128, 3, name='conv1')(x)
+        x = Conv2D(128, 3, name='conv2')(x)
+        x = Conv2D(128, 3, name='conv3')(x)
+        x = tf.layers.Flatten()(x)
+        output = Dense(num_outputs, activation=None, name='output_layer')(x)
+    else:
+        dense1 = tf.layers.dense(input_vec, 128, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
+        dense2 = tf.layers.dense(dense1, 128, activation=tf.nn.relu, name="dense2", reuse=tf.AUTO_REUSE)
+        output = tf.layers.dense(dense2, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
 
     #output = tf.identity(output, name="action")
 
@@ -22,7 +41,7 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
 
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.999
         self.learning_rate = 0.01
         self.batch_size = batch_size
 
@@ -120,6 +139,9 @@ class DQNAgent:
 
     def update_epsilon(self):
         return tf.cond(tf.greater(self.epsilon, self.epsilon_min), lambda: tf.assign(self.epsilon, self.epsilon * self.epsilon_decay), lambda: self.epsilon)
+
+    def reset_epsilon(self, value):
+        return tf.assign(self.epsilon, value)
 
     def get_embeddings(self, states):
         return self.define_model(self.qnet, states, self.observation_size, trainable=False, return_embedding=True)

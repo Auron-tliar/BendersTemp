@@ -81,6 +81,9 @@ public abstract class Bender : MonoBehaviour
 
     protected States _frozenPrevState = States.Idle;
 
+    protected bool _isHit = false;
+    protected bool _isDefeated = false;
+
     public BenderIconController IconObject
     {
         get
@@ -149,6 +152,9 @@ public abstract class Bender : MonoBehaviour
             return;
         }
 
+        if (Owner == null)
+            return;
+
         if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             if (_selected)
@@ -187,7 +193,7 @@ public abstract class Bender : MonoBehaviour
                     break;
             }
             AbilitySelector = -1;
-            
+
             _rotation += RotationSpeedInput * StandardRotationSpeed * Time.deltaTime;
             _rigidbody.rotation = (Quaternion.Euler(new Vector3(0f, _rotation, 0f)));
             if (_rigidbody.velocity.magnitude <= 0.01 && _rigidbody.velocity.y <= Mathf.Epsilon)
@@ -196,19 +202,19 @@ public abstract class Bender : MonoBehaviour
             }
             _rigidbody.velocity = transform.forward * SpeedInput * StandardSpeed;
         }
-        
+
         if (((Owner.Type == PlayerController.PlayerTypes.AI || Owner.Type == PlayerController.PlayerTypes.HumanKeyBoard) && Mathf.Abs(SpeedInput) > 0.01) ||
             ((Owner.Type == PlayerController.PlayerTypes.HumanMouse) && NavAgent.velocity.magnitude > 0.01))
         {
             BenderAnimator.SetBool("Moving", true);
             State = States.Moving;
+            _isHit = false;
         }
         else
         {
             BenderAnimator.SetBool("Moving", false);
             State = States.Idle;
         }
-
     }
 
     public void StartAbility(States state, int number)
@@ -251,11 +257,26 @@ public abstract class Bender : MonoBehaviour
             BenderAnimator.SetBool("Moving", false);
             _frozenPrevState = States.Recovering;
         }
+
+        _isHit = true;
     }
 
     public bool IsHit()
     {
-        return !BenderAnimator.GetBool("Moving");
+        /*try
+        {
+            return !BenderAnimator.GetBool("Moving");
+        }
+        catch
+        {
+            return false;
+        }*/
+        return _isHit;
+    }
+
+    public bool IsDefeated()
+    {
+        return _isDefeated;
     }
 
     public void GotRevived()
@@ -343,7 +364,9 @@ public abstract class Bender : MonoBehaviour
 
     public void Defeat()
     {
-        IconObject.RemovedMask.SetActive(true);
+        if (IconObject != null)
+            IconObject.RemovedMask.SetActive(true);
+
         if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             HumanControllerMouse hc = Owner.GetComponent<HumanControllerMouse>();
@@ -352,6 +375,8 @@ public abstract class Bender : MonoBehaviour
                 hc.Selection = null;
             }
         }
+
+        _isDefeated = true;
 
         Debug.Log(name + " defeated");
         Destroy(gameObject);

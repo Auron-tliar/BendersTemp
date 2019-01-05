@@ -10,4 +10,5 @@ obj/
 UIElementsSchema/
 
 Build/
+BuildFinalGame/
 *.csproj
