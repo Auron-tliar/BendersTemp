@@ -98,7 +98,7 @@ def main():
             saver.restore(sess, 'model/weights')
             print('restored model')
 
-            sess.run(agent.reset_epsilon(0.7))
+            sess.run(agent.reset_epsilon(0.4))
 
         loss_list = []
 

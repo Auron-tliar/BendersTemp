@@ -16,7 +16,7 @@ public class HumanControllerKeyBoard : HumanController
         bender.Owner = this;
 
 
-        abilityPanelKey = panels.GetComponent<Panels>().addAbilityPanel(bender);
+        abilityPanelKey = Panels.GetComponent<Panels>().addAbilityPanel(bender);
     }
 
 

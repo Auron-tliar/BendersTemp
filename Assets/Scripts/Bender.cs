@@ -152,6 +152,9 @@ public abstract class Bender : MonoBehaviour
             return;
         }
 
+        if (Owner == null)
+            return;
+
         if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             if (_selected)
@@ -205,14 +208,13 @@ public abstract class Bender : MonoBehaviour
         {
             BenderAnimator.SetBool("Moving", true);
             State = States.Moving;
+            _isHit = false;
         }
         else
         {
             BenderAnimator.SetBool("Moving", false);
             State = States.Idle;
         }
-
-        _isHit = false;
     }
 
     public void StartAbility(States state, int number)

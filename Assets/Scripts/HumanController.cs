@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class HumanController : PlayerController
 {
-    public GameObject panels;
+    public GameObject Panels;
 }

@@ -29,7 +29,7 @@ public class HumanControllerMouse : HumanController
             if (_selection != null)
             {
                 _selection.GotDeselected();
-                Debug.Log(panels.GetComponent<Panels>().removeAbilityPanel(abilityPanelKey));
+                Debug.Log(Panels.GetComponent<Panels>().removeAbilityPanel(abilityPanelKey));
             }
             _selection = value;
             if (_selection != null)
@@ -37,7 +37,7 @@ public class HumanControllerMouse : HumanController
                 if (!_selection.isSelected())
                 {
                     _selection.GotSelected();
-                    abilityPanelKey = panels.GetComponent<Panels>().addAbilityPanel(_selection);
+                    abilityPanelKey = Panels.GetComponent<Panels>().addAbilityPanel(_selection);
                 }
 
             }

@@ -97,7 +97,15 @@ public class AIAgent : Agent {
         // Enemy grid
         float[] enemyGrid = new float[width * height];
 
-        if (bender.transform == null)
+        try
+        {
+            if (bender.transform == null)
+            {
+                AddVectorObs(enemyGrid);
+                return;
+            }
+        }
+        catch
         {
             AddVectorObs(enemyGrid);
             return;
@@ -131,7 +139,7 @@ public class AIAgent : Agent {
                     float enemyY = enemyPosition.z / sampleScale.z * downsampleFactor;
                     Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX+width)/2), (int)(enemyY+height)/2);
 
-                    Debug.Log(enemySamplePosition);
+                    //Debug.Log(enemySamplePosition);
 
                     int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
 
@@ -199,24 +207,31 @@ public class AIAgent : Agent {
 
         //Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
 
-        switch (selectedAction)
+        try
         {
-            case 1:
-                bender.StartAbility(Bender.States.Casting1, 0); break;
-            case 2:
-                bender.StartAbility(Bender.States.Casting2, 1); break;
-            case 3:
-                bender.StartAbility(Bender.States.Casting3, 2); break;
-            case 4:
-                bender.SpeedInput = 2f; break;
-            case 5:
-                bender.SpeedInput = -2f; break;
-            case 6:
-                bender.RotationSpeedInput = 5f; break;
-            case 7:
-                bender.RotationSpeedInput = -5f; break;
-            default:
-                break;
+            switch (selectedAction)
+            {
+                case 1:
+                    bender.StartAbility(Bender.States.Casting1, 0); break;
+                case 2:
+                    bender.StartAbility(Bender.States.Casting2, 1); break;
+                case 3:
+                    bender.StartAbility(Bender.States.Casting3, 2); break;
+                case 4:
+                    bender.SpeedInput = 2f; break;
+                case 5:
+                    bender.SpeedInput = -2f; break;
+                case 6:
+                    bender.RotationSpeedInput = 5f; break;
+                case 7:
+                    bender.RotationSpeedInput = -5f; break;
+                default:
+                    break;
+            }
+        }
+        catch
+        {
+            Debug.Log("could not execute action: "+selectedAction);
         }
 
     }
