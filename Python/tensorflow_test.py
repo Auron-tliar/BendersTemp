@@ -101,6 +101,7 @@ def main():
             sess.run(agent.reset_epsilon(0.4))
 
         loss_list = []
+        rewards_list = []
 
         saved_loss_list_data = [f for f in os.listdir(result_dir) if '.dump' in f]
         continue_training = len(saved_loss_list_data) > 0
@@ -125,6 +126,8 @@ def main():
             # print('action_vecs: '+str(action_vecs))
 
             new_observations, rewards, done, info = env.step(action_vecs)
+
+            rewards_list.append(rewards)
 
             for agent_idx in range(num_agents):
                 sel_action = np.argmax(action_vecs[agent_idx])
@@ -157,15 +160,24 @@ def main():
                     plt.xlabel('step')
                     plt.savefig('results/loss_step_%s.pdf' % (step))
                     plt.clf()
+
+                    np_rewards = np.array(rewards_list)
+                    for i in range(np_rewards.shape[1]):
+                        plt.plot(np_rewards[:, i])
+                    plt.title('rewards step: %d' % (step))
+                    plt.ylabel('reward')
+                    plt.xlabel('step')
+                    plt.savefig('results/rewards_step_%s.pdf' % (step))
+                    plt.clf()
                 except:
                     print('could save plot')
 
-            if (step % 200 == 0 and step) > 0: #or done:
+            if (step % 300 == 0 and step) > 0: #or done:
                 observations = env.reset()
                 print('resetting environment')
                 #history = []
 
-            if step % 500 == 0 and step > 0:
+            if step % 1000 == 0 and step > 0:
                 saver.save(sess, 'model/weights')
                 export_graph(sess)
 

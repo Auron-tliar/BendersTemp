@@ -214,6 +214,7 @@ public abstract class Bender : MonoBehaviour
         {
             BenderAnimator.SetBool("Moving", false);
             State = States.Idle;
+            _isHit = false;
         }
     }
 

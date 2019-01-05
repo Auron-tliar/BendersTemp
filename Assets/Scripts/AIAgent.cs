@@ -37,7 +37,10 @@ public class AIAgent : Agent {
     public override void AgentReset()
     {
         Debug.Log("Resetting agent " + name);
-        Vector3 newPosition = initialPosition; //bender.transform.position;
+        //Vector3 newPosition = initialPosition; //bender.transform.position;
+        Vector3 newPosition = terrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
+        Quaternion newAngle = Quaternion.AngleAxis(Random.Range(0.0f, 360.0f), Vector3.up);
+
         newPosition.y = terrain.SampleHeight(newPosition);
 
         var controller = bender.Owner;
@@ -45,7 +48,8 @@ public class AIAgent : Agent {
         // Recreate the bender
         // TODO: Wasteful, should reuse bender if possible
         if (bender != null) Destroy(bender.gameObject);
-        bender = Instantiate(template, newPosition, Quaternion.identity, transform);
+
+        bender = Instantiate(template, newPosition, newAngle, transform);
         bender.gameObject.SetActive(true);
         bender.Owner = controller;
 
@@ -171,25 +175,25 @@ public class AIAgent : Agent {
         {
             if (!enemy.IsDefeated() && enemy.IsHit())
             {
-                AddReward(10);
+                AddReward(1);
             }
             if (enemy.IsDefeated())
             {
-                AddReward(100);
+                AddReward(10);
             }
         }
 
-        if (bender == null || bender.IsDefeated())
+        /*if (bender == null || bender.IsDefeated())
         {
             //Done();
             AddReward(-100f);
-        }
+        }*/
 
 
-        if (!bender.IsDefeated() && bender.IsHit())
+        /*if (!bender.IsDefeated() && bender.IsHit())
         {
             AddReward(-1f);
-        }
+        }*/
 
 
         // Perform actions

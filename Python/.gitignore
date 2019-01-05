@@ -116,5 +116,5 @@ dmypy.json
 
 .idea/
 
-model/
+model*/
 results/
