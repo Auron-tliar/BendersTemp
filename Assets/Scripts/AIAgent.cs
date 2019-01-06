@@ -30,15 +30,15 @@ public class AIAgent : Agent {
          
         terrain = Terrain.activeTerrain;
 
-        initialPosition = bender.transform.position;
+        initialPosition = transform.position;
     }
 
 
     public override void AgentReset()
     {
         Debug.Log("Resetting agent " + name);
-        //Vector3 newPosition = initialPosition; //bender.transform.position;
-        Vector3 newPosition = terrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
+        Vector3 newPosition = initialPosition; //bender.transform.position;
+        //Vector3 newPosition = terrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
         Quaternion newAngle = Quaternion.AngleAxis(Random.Range(0.0f, 360.0f), Vector3.up);
 
         newPosition.y = terrain.SampleHeight(newPosition);
@@ -50,6 +50,7 @@ public class AIAgent : Agent {
         if (bender != null) Destroy(bender.gameObject);
 
         bender = Instantiate(template, newPosition, newAngle, transform);
+        bender.transform.localPosition = Vector3.zero;
         bender.gameObject.SetActive(true);
         bender.Owner = controller;
 

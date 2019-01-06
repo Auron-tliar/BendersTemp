@@ -108,9 +108,16 @@ public abstract class Bender : MonoBehaviour
         {
             _owner = value;
 
-            Color baseColor = Owner.PlayerColor;
-            baseColor.a = 0.5f;
-            Base.GetComponent<Renderer>().material.color = baseColor;
+            try
+            {
+                Color baseColor = _owner.PlayerColor;
+                baseColor.a = 0.5f;
+                Base.GetComponent<Renderer>().material.color = baseColor;
+            }
+            catch
+            {
+
+            }
         }
     }
 

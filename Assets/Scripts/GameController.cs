@@ -29,6 +29,8 @@ public class GameController : MonoBehaviour
     public GameObject FireBenderPrefab;
     public GameObject WaterBenderPrefab;
 
+    public MLAgents.Brain brain;
+
     private int _currentTrack = -1;
 
     private void Start()
@@ -77,8 +79,31 @@ public class GameController : MonoBehaviour
                         temp = null;
                         break;
                 }
-                Instantiate(temp, SpawnPoints[i].GetChild(j).position,
-                    SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
+
+
+                if (MatchSettings.PlayerTypes[i] == PlayerController.PlayerTypes.AI)
+                {
+                    GameObject aiAgentTemplate = new GameObject("AIAgent");
+                    aiAgentTemplate.SetActive(false);
+
+                    aiAgentTemplate.AddComponent<AIAgent>();
+                    aiAgentTemplate.GetComponent<AIAgent>().brain = brain;
+
+                    GameObject aiAgent = Instantiate(aiAgentTemplate, SpawnPoints[i].GetChild(j).position, SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
+                   
+                    Instantiate(temp, SpawnPoints[i].GetChild(j).position, SpawnPoints[i].GetChild(j).rotation, aiAgent.transform);
+
+                    aiAgent.SetActive(true);
+
+                    Destroy(aiAgentTemplate);
+                }
+                else
+                {
+                    Instantiate(temp, SpawnPoints[i].GetChild(j).position,
+                        SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
+                }
+                
+                
             }
             PlayerControllers[i].PlayerColor = MatchSettings.PlayerColors[i];
         }

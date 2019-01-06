@@ -28,11 +28,15 @@ public abstract class PlayerController : MonoBehaviour
             Bender bender = benders[i];
             bender.Owner = this;
 
-            if (Type != PlayerTypes.AI)
+            if (IconPrefab != null)
             {
                 BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
                 icon.DependentBender = bender;
                 bender.IconObject = icon;
+            }
+
+            if (Type == PlayerTypes.HumanKeyBoard)
+            {
                 bender.NavAgent.enabled = false;
             }
         }
