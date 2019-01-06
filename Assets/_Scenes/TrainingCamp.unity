@@ -3706,6 +3706,7 @@ MonoBehaviour:
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 30
+  isInTrainingCamp: 1
 --- !u!1001 &1920537418
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4177,6 +4178,7 @@ MonoBehaviour:
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 30
+  isInTrainingCamp: 1
 --- !u!1 &2138267565
 GameObject:
   m_ObjectHideFlags: 0
