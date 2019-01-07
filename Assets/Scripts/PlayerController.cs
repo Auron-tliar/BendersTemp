@@ -35,7 +35,7 @@ public abstract class PlayerController : MonoBehaviour
                 bender.IconObject = icon;
             }
 
-            if (Type == PlayerTypes.HumanKeyBoard)
+            if (Type != PlayerTypes.HumanMouse)
             {
                 bender.NavAgent.enabled = false;
             }
