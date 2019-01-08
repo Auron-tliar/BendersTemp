@@ -1,4 +1,4 @@
-﻿using MLAgents;
+using MLAgents;
 using System.Linq;
 using UnityEngine;
 
@@ -18,19 +18,21 @@ public class AIAgent : Agent {
 
     public bool isInTrainingCamp = false;
 
+    private float downsampleFactorCorrection = downsampleFactor; //*1.2f;
+
     public override void InitializeAgent()
     {
         bender = GetComponentInChildren<Bender>();
 
         bender.gameObject.SetActive(false);
         template = Instantiate(bender, transform.parent);
-        
+        //template.NavAgent.enabled = false;
 
         // Find enemy controller
         AIController[] controllers = Component.FindObjectsOfType<AIController>();
         var controller = controllers.First((x) => x != bender.Owner);
         enemies = controller.GetComponentsInChildren<Bender>();
-         
+
         terrain = Terrain.activeTerrain;
 
         initialPosition = transform.position;
@@ -46,9 +48,9 @@ public class AIAgent : Agent {
         Vector3 newPosition;
         Quaternion newAngle;
 
-        if (isInTrainingCamp)
+        if (isInTrainingCamp && Terrain.activeTerrain != null)
         {
-            newPosition = terrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
+            newPosition = Terrain.activeTerrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
             newAngle = Quaternion.AngleAxis(Random.Range(0.0f, 360.0f), Vector3.up);
         }
         else
@@ -70,6 +72,7 @@ public class AIAgent : Agent {
 
         bender = Instantiate(template, newPosition, newAngle, transform);
         bender.gameObject.SetActive(true);
+        bender.NavAgent.enabled = false;
         bender.Owner = controller;
 
         //bender.transform.position = newPosition;
@@ -119,6 +122,7 @@ public class AIAgent : Agent {
 
         // Enemy grid
         float[] enemyGrid = new float[width * height];
+        enemyGrid.Fill(-1);
 
         try
         {
@@ -137,10 +141,36 @@ public class AIAgent : Agent {
 
         // Subtract the position of the bender to have relative enemy positions
         Vector3 position = bender.transform.position;
+        Vector3 terrainPosition = terrain.transform.position;
         float y_rotation = bender.transform.rotation.eulerAngles.y;
+        Quaternion rotation = bender.transform.rotation;
 
         //Debug.Log("y_rotation:" + y_rotation);
-        
+
+        Vector3 p = new Vector3(0, 0, 0);
+
+        for (int y = 0; y < terrain.terrainData.size.z; y++)
+        {
+            for (int x = 0; x < terrain.terrainData.size.x; x++)
+            {
+                p.Set(x, 0, y);
+                p = p + terrainPosition - position;
+                p = (rotation * p);
+
+                float enemyX = p.x / sampleScale.x * downsampleFactorCorrection;
+                float enemyY = p.z / sampleScale.z * downsampleFactorCorrection;
+
+                Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX + width) / 2), (int)(enemyY + height) / 2);
+
+                //Debug.Log(enemySamplePosition);
+
+                int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
+
+                if (grid_pos >= 0 && grid_pos < width * height)
+                    enemyGrid[grid_pos] = 0;
+            }
+        }
+
 
         if (enemies == null) {
             enemies = enemyController.GetComponentsInChildren<Bender>();
@@ -150,15 +180,15 @@ public class AIAgent : Agent {
         {
             foreach (var enemy in enemies)
             {
-                if (enemy != null)
+                if (enemy != null && !enemy.IsDefeated())
                 {
                     Vector3 enemyPosition = enemy.transform.position;
                     enemyPosition -= position;
 
-                    enemyPosition = bender.transform.rotation * enemyPosition;
+                    enemyPosition = rotation * enemyPosition;
 
-                    float enemyX = enemyPosition.x / sampleScale.x * downsampleFactor;
-                    float enemyY = enemyPosition.z / sampleScale.z * downsampleFactor;
+                    float enemyX = enemyPosition.x / sampleScale.x * downsampleFactorCorrection;
+                    float enemyY = enemyPosition.z / sampleScale.z * downsampleFactorCorrection;
                     Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX+width)/2), (int)(enemyY+height)/2);
 
                     //Debug.Log(enemySamplePosition);
@@ -166,7 +196,16 @@ public class AIAgent : Agent {
                     int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
 
                     if (grid_pos >= 0 && grid_pos < width * height)
-                        enemyGrid[grid_pos] += 1;
+                    {
+                        if (enemyGrid[grid_pos] < 0)
+                        {
+                            enemyGrid[grid_pos] = 1;
+                        }
+                        else
+                        {
+                            enemyGrid[grid_pos] += 1;
+                        }
+                    }
                 }
             }
         }
@@ -193,19 +232,29 @@ public class AIAgent : Agent {
         {
             if (!enemy.IsDefeated() && enemy.IsHit())
             {
-                AddReward(1);
+                AddReward(2);
             }
             if (enemy.IsDefeated())
             {
                 AddReward(10);
             }
+
+            if (bender != null && enemy != null && !bender.IsDefeated())
+            {
+                float angle = Vector3.Angle((enemy.transform.position - bender.transform.position), bender.transform.forward);
+                if (System.Math.Abs(angle) < 3f)
+                {
+                    //Debug.Log("looking at enemy!");
+                    AddReward(1);
+                }
+            }
         }
 
-        /*if (bender == null || bender.IsDefeated())
+        if (bender == null || bender.IsDefeated())
         {
             //Done();
-            AddReward(-100f);
-        }*/
+            AddReward(-10f);
+        }
 
 
         /*if (!bender.IsDefeated() && bender.IsHit())

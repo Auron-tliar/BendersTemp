@@ -23,7 +23,7 @@ class UnityEnv(gym.Env):
     https://github.com/openai/multiagent-particle-envs
     """
 
-    def __init__(self, environment_filename: str, worker_id=0, use_visual=False, multiagent=False):
+    def __init__(self, environment_filename: str, worker_id=0, use_visual=False, multiagent=False, no_graphics=True):
         """
         Environment initialization
         :param environment_filename: The UnityEnvironment path or file to be wrapped in the gym.
@@ -31,7 +31,7 @@ class UnityEnv(gym.Env):
         :param use_visual: Whether to use visual observation or vector observation.
         :param multiagent: Whether to run in multi-agent mode (lists of obs, reward, done).
         """
-        self._env = UnityEnvironment(environment_filename, worker_id)
+        self._env = UnityEnvironment(environment_filename, worker_id, no_graphics=no_graphics)
         self.name = self._env.academy_name
         self.visual_obs = None
         self._current_state = None

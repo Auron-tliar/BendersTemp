@@ -23,4 +23,16 @@ public class FallZone : MonoBehaviour
             }
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Bender")
+        {
+            if (other.GetComponent<AIAgent>() != null && other.GetComponent<AIAgent>().isInTrainingCamp)
+            {
+                other.GetComponent<Bender>().Defeat();
+            }
+
+        }
+    }
 }

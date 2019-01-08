@@ -47,14 +47,28 @@ def plot_observations(observations):
         # print(points_x)
         # print(points_y)
 
-    plt.xlim((-w/2, w/2))
-    plt.ylim((-h/2, h/2))
+        points_x = []
+        points_y = []
+        # print(grid)
 
-    plt.show()
-    plt.clf()
+        for y in range(h):
+            for x in range(w):
+                if grid[x, y] < 0:
+                    points_x.append(x-w/2)
+                    points_y.append(y-h/2)
+
+        plt.scatter(points_x, points_y)
+
+        plt.xlim((-w/2, w/2))
+        plt.ylim((-h/2, h/2))
+
+        plt.show()
+        plt.clf()
+
+
 
 def main():
-    env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False, multiagent=True)
+    env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False, multiagent=True, no_graphics=True)
 
     observation_header_size = 3
     observation_size = len(env.observation_space.low)
@@ -133,9 +147,7 @@ def main():
                 sel_action = np.argmax(action_vecs[agent_idx])
                 history.append(np.concatenate((observations[agent_idx], new_observations[agent_idx], [sel_action], [rewards[agent_idx]])))
 
-            if step % 2 == 0:
-                # plot_observations(new_observations)
-
+            if step % 3 == 0:
                 if len(history) >= minibatch_size:
                     random_minibatch = np.array(history)[np.random.choice(len(history), size=minibatch_size, replace=False), :]
                     _, model_loss, epsilon = sess.run(history_replay_action, feed_dict={minibatch: random_minibatch})
@@ -151,8 +163,10 @@ def main():
                 if len(history) > 2000:
                     history = history[1000:]
 
-            if step % 200 == 0 and step > 0:
+            if step % 400 == 0 and step > 0:
                 try:
+                    plot_observations(new_observations)
+
                     # loss
                     plt.plot(pd.DataFrame(loss_list).rolling(window=5).mean())
                     plt.title('loss step: %d' % (step))
