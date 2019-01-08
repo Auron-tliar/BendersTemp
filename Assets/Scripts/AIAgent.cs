@@ -22,8 +22,9 @@ public class AIAgent : Agent {
     {
         bender = GetComponentInChildren<Bender>();
 
+        bender.gameObject.SetActive(false);
         template = Instantiate(bender, transform.parent);
-        template.gameObject.SetActive(false);
+        
 
         // Find enemy controller
         AIController[] controllers = Component.FindObjectsOfType<AIController>();
@@ -33,6 +34,8 @@ public class AIAgent : Agent {
         terrain = Terrain.activeTerrain;
 
         initialPosition = transform.position;
+
+        AgentReset();
     }
 
 
@@ -108,7 +111,7 @@ public class AIAgent : Agent {
         }
 
         brain.brainParameters.vectorObservationSize = observationSize;
-        Debug.Log("observationSize:" + observationSize);
+        //Debug.Log("observationSize:" + observationSize);
         //Debug.Log("BenderType:" + (float)bender.BenderType);
         //Debug.Log("width:" + width);
         //Debug.Log("height:" + height);
@@ -136,8 +139,7 @@ public class AIAgent : Agent {
         Vector3 position = bender.transform.position;
         float y_rotation = bender.transform.rotation.eulerAngles.y;
 
-        Debug.Log("y_rotation:" + y_rotation);
-
+        //Debug.Log("y_rotation:" + y_rotation);
         
 
         if (enemies == null) {

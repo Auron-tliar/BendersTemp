@@ -60,7 +60,7 @@ def main():
     observation_size = len(env.observation_space.low)
     action_size = len(env.action_space.low)
 
-    minibatch_size = 64
+    minibatch_size = 128
     total_step_count = 100000
 
     agent = DQNAgent('bender_agent', observation_size, action_size, minibatch_size)
@@ -98,7 +98,7 @@ def main():
             saver.restore(sess, 'model/weights')
             print('restored model')
 
-            sess.run(agent.reset_epsilon(0.4))
+            sess.run(agent.reset_epsilon(0.5))
 
         loss_list = []
         rewards_list = []
@@ -133,7 +133,7 @@ def main():
                 sel_action = np.argmax(action_vecs[agent_idx])
                 history.append(np.concatenate((observations[agent_idx], new_observations[agent_idx], [sel_action], [rewards[agent_idx]])))
 
-            if step % 10 == 0:
+            if step % 2 == 0:
                 # plot_observations(new_observations)
 
                 if len(history) >= minibatch_size:
@@ -148,8 +148,8 @@ def main():
                     print("step: {}, reward: {} sel_action: {}".format(step, np.mean(rewards), sel_action))
 
                 # reduce histroy size
-                if len(history) > 500:
-                    history = history[250:]
+                if len(history) > 2000:
+                    history = history[1000:]
 
             if step % 200 == 0 and step > 0:
                 try:
@@ -159,6 +159,7 @@ def main():
                     plt.ylabel('loss')
                     plt.xlabel('step')
                     plt.savefig('results/loss_step_%s.pdf' % (step))
+                    plt.show()
                     plt.clf()
 
                     np_rewards = np.array(rewards_list)
@@ -168,11 +169,12 @@ def main():
                     plt.ylabel('reward')
                     plt.xlabel('step')
                     plt.savefig('results/rewards_step_%s.pdf' % (step))
+                    plt.show()
                     plt.clf()
                 except:
                     print('could save plot')
 
-            if (step % 300 == 0 and step) > 0: #or done:
+            if (step % 200 == 0 and step) > 0: #or done:
                 observations = env.reset()
                 print('resetting environment')
                 #history = []
