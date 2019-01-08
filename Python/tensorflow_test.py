@@ -25,13 +25,13 @@ def export_graph(sess):
                               restore_op_name="save/restore_all", filename_tensor_name="save/Const:0")
 
 
-def plot_observations(observations):
+def plot_observations(observations, observation_header_size):
     # np.set_printoptions(threshold=np.inf)
 
     for observation in observations:
         w = int(observation[1])
         h = int(observation[2])
-        grid = observation[3:].reshape(w, h)
+        grid = observation[observation_header_size:].reshape(w, h)
         # print(np.sum(grid))
         points_x = []
         points_y = []
@@ -68,9 +68,9 @@ def plot_observations(observations):
 
 
 def main():
-    env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False, multiagent=True, no_graphics=True)
+    env = UnityEnv("../Build/BendersTemp.exe", 0, use_visual=False, multiagent=True, no_graphics=False)
 
-    observation_header_size = 3
+    observation_header_size = 4
     observation_size = len(env.observation_space.low)
     action_size = len(env.action_space.low)
 
@@ -112,7 +112,7 @@ def main():
             saver.restore(sess, 'model/weights')
             print('restored model')
 
-            sess.run(agent.reset_epsilon(0.5))
+            sess.run(agent.reset_epsilon(0.7))
 
         loss_list = []
         rewards_list = []
@@ -147,6 +147,8 @@ def main():
                 sel_action = np.argmax(action_vecs[agent_idx])
                 history.append(np.concatenate((observations[agent_idx], new_observations[agent_idx], [sel_action], [rewards[agent_idx]])))
 
+            defeated_count = sum([o[3] for o in new_observations])
+
             if step % 3 == 0:
                 if len(history) >= minibatch_size:
                     random_minibatch = np.array(history)[np.random.choice(len(history), size=minibatch_size, replace=False), :]
@@ -160,19 +162,19 @@ def main():
                     print("step: {}, reward: {} sel_action: {}".format(step, np.mean(rewards), sel_action))
 
                 # reduce histroy size
-                if len(history) > 2000:
-                    history = history[1000:]
+                if len(history) > 3000:
+                    history = history[1500:]
 
             if step % 400 == 0 and step > 0:
                 try:
-                    plot_observations(new_observations)
+                    plot_observations(new_observations, observation_header_size)
 
                     # loss
-                    plt.plot(pd.DataFrame(loss_list).rolling(window=5).mean())
+                    plt.plot(pd.DataFrame(loss_list[500:]).rolling(window=5).mean())
                     plt.title('loss step: %d' % (step))
                     plt.ylabel('loss')
                     plt.xlabel('step')
-                    plt.savefig('results/loss_step_%s.pdf' % (step))
+                    plt.savefig(result_dir+'/loss_step_%s.pdf' % (step))
                     plt.show()
                     plt.clf()
 
@@ -182,22 +184,21 @@ def main():
                     plt.title('rewards step: %d' % (step))
                     plt.ylabel('reward')
                     plt.xlabel('step')
-                    plt.savefig('results/rewards_step_%s.pdf' % (step))
+                    plt.savefig(result_dir+'/rewards_step_%s.pdf' % (step))
                     plt.show()
                     plt.clf()
                 except:
                     print('could save plot')
 
-            if (step % 200 == 0 and step) > 0: #or done:
+            if (step % 200 == 0 and step) > 0 or defeated_count >= 1:
                 observations = env.reset()
                 print('resetting environment')
-                #history = []
 
             if step % 1000 == 0 and step > 0:
                 saver.save(sess, 'model/weights')
                 export_graph(sess)
 
-                pickle.dump(loss_list, open('results/loss_step_%s.dump' % step, 'wb'))
+                pickle.dump(loss_list, open(result_dir+'/loss_step_%s.dump' % step, 'wb'))
 
         saver.save(sess, 'model/weights')
 

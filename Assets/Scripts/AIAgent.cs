@@ -18,6 +18,8 @@ public class AIAgent : Agent {
 
     public bool isInTrainingCamp = false;
 
+    public float randomActionProbabiliy = 0.0f;
+
     private float downsampleFactorCorrection = downsampleFactor; //*1.2f;
 
     public override void InitializeAgent()
@@ -99,10 +101,11 @@ public class AIAgent : Agent {
 
 
         // Set observation memory
-        int observationSize = width * height + 3;
+        int observationSize = width * height + 4;
+        float isDefeated = bender.IsDefeated() ? 1.0f : 0.0f;
 
         // add general information header
-        AddVectorObs(new float[] { (float)bender.BenderType, width, height });
+        AddVectorObs(new float[] { (float)bender.BenderType, width, height, isDefeated});
 
         if (useTerrainHeights)
         {
@@ -122,7 +125,7 @@ public class AIAgent : Agent {
 
         // Enemy grid
         float[] enemyGrid = new float[width * height];
-        enemyGrid.Fill(-1);
+        enemyGrid.Fill(-0.2f);
 
         try
         {
@@ -234,18 +237,20 @@ public class AIAgent : Agent {
             {
                 AddReward(2);
             }
-            if (enemy.IsDefeated())
+            if (enemy.IsHit() && enemy.IsDefeated())
             {
-                AddReward(10);
+                AddReward(3);
             }
 
             if (bender != null && enemy != null && !bender.IsDefeated())
             {
                 float angle = Vector3.Angle((enemy.transform.position - bender.transform.position), bender.transform.forward);
-                if (System.Math.Abs(angle) < 3f)
+                if (System.Math.Abs(angle) < 5f)
                 {
                     //Debug.Log("looking at enemy!");
                     AddReward(1);
+                    bender.RotationSpeedInput = 0f;
+                    bender.transform.LookAt(enemy.transform);
                 }
             }
         }
@@ -253,7 +258,7 @@ public class AIAgent : Agent {
         if (bender == null || bender.IsDefeated())
         {
             //Done();
-            AddReward(-10f);
+            AddReward(-3f);
         }
 
 
@@ -273,8 +278,19 @@ public class AIAgent : Agent {
 
         int selectedAction = MaxIndex(vectorAction);
 
-        if (selectedAction == 0)
-            AddReward(-1);
+        if (randomActionProbabiliy > 0f)
+        {
+            Random.InitState((int)System.DateTime.Now.Ticks);
+
+            if (Random.Range(0.0f, 1.0f) < randomActionProbabiliy)
+            {
+                selectedAction = Random.Range(0, 5);
+            }
+        }
+        
+
+        //if (selectedAction == 0)
+        //    AddReward(-1);
 
         //Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
 
@@ -282,20 +298,20 @@ public class AIAgent : Agent {
         {
             switch (selectedAction)
             {
-                case 1:
+                case 0:
                     bender.StartAbility(Bender.States.Casting1, 0); break;
+                case 1:
+                    bender.SpeedInput = 1f; break;
                 case 2:
-                    bender.StartAbility(Bender.States.Casting2, 1); break;
+                    bender.SpeedInput = -1f; break;
                 case 3:
-                    bender.StartAbility(Bender.States.Casting3, 2); break;
+                    bender.RotationSpeedInput = 1f; break;
                 case 4:
-                    bender.SpeedInput = 2f; break;
+                    bender.RotationSpeedInput = -1f; break;
                 case 5:
-                    bender.SpeedInput = -2f; break;
+                    bender.StartAbility(Bender.States.Casting2, 1); break;
                 case 6:
-                    bender.RotationSpeedInput = 5f; break;
-                case 7:
-                    bender.RotationSpeedInput = -5f; break;
+                    bender.StartAbility(Bender.States.Casting3, 2); break;
                 default:
                     break;
             }

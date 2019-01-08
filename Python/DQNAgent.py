@@ -12,19 +12,25 @@ def Conv2D(filters, kernel_size, name):
     return lambda inputs: tf.layers.conv2d(inputs, filters, (kernel_size, kernel_size), activation='relu', kernel_initializer=tf.glorot_uniform_initializer(), name=name, reuse=tf.AUTO_REUSE)
 
 
-def create_network(input_vec, num_inputs, num_outputs, name):
+def create_network(input_vec, num_inputs, num_outputs, name, observation_header_size = 4):
     if True:
         w = int(sqrt(num_inputs))
-        x = tf.reshape(input_vec[:, 3:], (-1, w, w, 1))
+        x = tf.reshape(input_vec[:, observation_header_size:], (-1, w, w, 1))
         x = Conv2D(128, 3, name='conv1')(x)
         x = Conv2D(128, 3, name='conv2')(x)
-        x = Conv2D(128, 3, name='conv3')(x)
+        #x = Conv2D(128, 3, name='conv3')(x)
+        x = Dense(128, name="dense3")(x)
         x = tf.layers.Flatten()(x)
         output = Dense(num_outputs, activation=None, name='output_layer')(x)
     else:
-        dense1 = tf.layers.dense(input_vec, 128, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
-        dense2 = tf.layers.dense(dense1, 128, activation=tf.nn.relu, name="dense2", reuse=tf.AUTO_REUSE)
-        output = tf.layers.dense(dense2, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
+        w = int(sqrt(num_inputs))
+        x = tf.reshape(input_vec[:, observation_header_size:], (-1, w, w, 1))
+        x = Conv2D(128, 3, name='conv1')(x)
+        x = tf.layers.Flatten()(x)
+        x = Dense(128, name="dense1")(x)
+        x = Dense(128, name="dense2")(x)
+        x = Dense(128, name="dense3")(x)
+        output = Dense(num_outputs, activation=None, name='output_layer')(x)
 
     #output = tf.identity(output, name="action")
 
@@ -107,6 +113,17 @@ class DQNAgent:
 
     def predict(self, state):
         return self.define_model(self.qnet, state, self.observation_size, trainable=False)
+
+    def random_predict(self, state, eps):
+        cond = tf.less_equal(tf.random_uniform(shape=[1]), eps)[0]
+
+        random_action = lambda: tf.one_hot(tf.random_uniform(shape=[1], minval=0, maxval=self.action_size, dtype=tf.int32)[0], self.action_size)
+
+        def prediction_action():
+            act_values = self.define_model(self.qnet, tf.reshape(state, (1, -1)), self.observation_size)[0]
+            return act_values
+
+        return tf.cond(cond, random_action, prediction_action)
 
     def target_qnet_predict(self, state):
         return self.define_model(self.target_qnet, state, self.observation_size, trainable=False)
