@@ -170,7 +170,10 @@ def main():
                     plot_observations(new_observations, observation_header_size)
 
                     # loss
-                    plt.plot(pd.DataFrame(loss_list[500:]).rolling(window=5).mean())
+                    if len(loss_list) > 1000:
+                        plt.plot(pd.DataFrame(loss_list[100:]).rolling(window=5).mean())
+                    else:
+                        plt.plot(pd.DataFrame(loss_list).rolling(window=5).mean())
                     plt.title('loss step: %d' % (step))
                     plt.ylabel('loss')
                     plt.xlabel('step')

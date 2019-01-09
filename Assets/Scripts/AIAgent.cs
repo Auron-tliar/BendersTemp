@@ -146,7 +146,7 @@ public class AIAgent : Agent {
         Vector3 position = bender.transform.position;
         Vector3 terrainPosition = terrain.transform.position;
         float y_rotation = bender.transform.rotation.eulerAngles.y;
-        Quaternion rotation = bender.transform.rotation;
+        Quaternion rotation = Quaternion.Inverse(bender.transform.rotation);
 
         //Debug.Log("y_rotation:" + y_rotation);
 
@@ -245,7 +245,7 @@ public class AIAgent : Agent {
             if (bender != null && enemy != null && !bender.IsDefeated())
             {
                 float angle = Vector3.Angle((enemy.transform.position - bender.transform.position), bender.transform.forward);
-                if (System.Math.Abs(angle) < 5f)
+                if (angle < 10f)
                 {
                     //Debug.Log("looking at enemy!");
                     AddReward(1);
@@ -305,9 +305,9 @@ public class AIAgent : Agent {
                 case 2:
                     bender.SpeedInput = -1f; break;
                 case 3:
-                    bender.RotationSpeedInput = 1f; break;
+                    bender.RotationSpeedInput = 0.5f; break;
                 case 4:
-                    bender.RotationSpeedInput = -1f; break;
+                    bender.RotationSpeedInput = -0.5f; break;
                 case 5:
                     bender.StartAbility(Bender.States.Casting2, 1); break;
                 case 6:
