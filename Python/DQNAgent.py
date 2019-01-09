@@ -61,7 +61,7 @@ class DQNAgent:
     def define_model(self, qnet, input_vec, input_shape, reference=None, trainable=False, return_embedding=False):
         print('defining model')
 
-        input_vec = tf.reshape(tf.stop_gradient(tf.clip_by_value(input_vec, -1000.0, 1000.0)), (-1, input_shape))
+        input_vec = tf.reshape(tf.stop_gradient(tf.clip_by_value(input_vec, -10.0, 10.0)), (-1, input_shape))
 
         if return_embedding:
             return qnet(input_vec, return_embedding=True)

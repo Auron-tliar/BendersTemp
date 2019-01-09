@@ -147,6 +147,8 @@ def main():
                 sel_action = np.argmax(action_vecs[agent_idx])
                 history.append(np.concatenate((observations[agent_idx], new_observations[agent_idx], [sel_action], [rewards[agent_idx]])))
 
+            observations = new_observations
+
             defeated_count = sum([o[3] for o in new_observations])
 
             if step % 3 == 0:

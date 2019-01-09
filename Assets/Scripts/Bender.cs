@@ -84,6 +84,8 @@ public abstract class Bender : MonoBehaviour
     protected bool _isHit = false;
     protected bool _isDefeated = false;
 
+    private int _recoveringCounter = 0;
+
     public BenderIconController IconObject
     {
         get
@@ -156,7 +158,16 @@ public abstract class Bender : MonoBehaviour
     {
         if (State != States.Idle && State != States.Moving)
         {
-            return;
+            if (_recoveringCounter > 20)
+            {
+                _recoveringCounter = 0;
+                State = States.Idle;
+            }
+            else
+            {
+                _recoveringCounter += 1;
+                return;
+            }
         }
 
         if (Owner == null)

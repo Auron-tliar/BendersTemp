@@ -160,16 +160,16 @@ public class AIAgent : Agent {
                 p = p + terrainPosition - position;
                 p = (rotation * p);
 
-                float enemyX = p.x / sampleScale.x * downsampleFactorCorrection;
-                float enemyY = p.z / sampleScale.z * downsampleFactorCorrection;
+                float pX = p.x / sampleScale.x * downsampleFactorCorrection;
+                float pY = p.z / sampleScale.z * downsampleFactorCorrection;
 
-                Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX + width) / 2), (int)(enemyY + height) / 2);
+                Vector2Int samplePosition = new Vector2Int((int)((pX + width) / 2), (int)(pY + height) / 2);
 
                 //Debug.Log(enemySamplePosition);
 
-                int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
+                int grid_pos = samplePosition.x * height + samplePosition.y;
 
-                if (grid_pos >= 0 && grid_pos < width * height)
+                if (grid_pos >= 0 && grid_pos < width * height && samplePosition.y >= 0 && samplePosition.y < height)
                     enemyGrid[grid_pos] = 0;
             }
         }
@@ -198,7 +198,7 @@ public class AIAgent : Agent {
 
                     int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
 
-                    if (grid_pos >= 0 && grid_pos < width * height)
+                    if (grid_pos >= 0 && grid_pos < width * height && enemySamplePosition.y >= 0 && enemySamplePosition.y < height)
                     {
                         if (enemyGrid[grid_pos] < 0)
                         {
@@ -280,7 +280,7 @@ public class AIAgent : Agent {
 
         if (randomActionProbabiliy > 0f)
         {
-            Random.InitState((int)System.DateTime.Now.Ticks);
+            //Random.InitState((int)System.DateTime.Now.Ticks);
 
             if (Random.Range(0.0f, 1.0f) < randomActionProbabiliy)
             {
@@ -299,7 +299,10 @@ public class AIAgent : Agent {
             switch (selectedAction)
             {
                 case 0:
-                    bender.StartAbility(Bender.States.Casting1, 0); break;
+                    if (bender.BenderType == Bender.BenderTypes.Air)
+                        bender.StartAbility(Bender.States.Casting2, 0);
+                    else bender.StartAbility(Bender.States.Casting1, 0);
+                    break;
                 case 1:
                     bender.SpeedInput = 1f; break;
                 case 2:
