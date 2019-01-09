@@ -356,4 +356,4 @@ MonoBehaviour:
   LifeTime: 5
   Speed: 10
   HitSound: {fileID: 8300000, guid: 201891168afeb4d409865f04a2148926, type: 3}
-  Power: 100
+  Power: 50

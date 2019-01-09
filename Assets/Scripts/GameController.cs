@@ -94,7 +94,8 @@ public class GameController : MonoBehaviour
                     GameObject aiAgent = Instantiate(AIAgentPrefab, SpawnPoints[i].GetChild(j).position, SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
 
                     aiAgent.GetComponent<AIAgent>().brain = brain;
-                    //aiAgent.GetComponent<AIAgent>().isInTrainingCamp = true;
+                    //aiAgent.GetComponent<AIAgent>().randomActionProbabiliy = 0.1f;
+                    aiAgent.GetComponent<AIAgent>().noActionInterval = 30;
 
                     GameObject bender = Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);
                     bender.GetComponent<Bender>().Owner = PlayerControllers[i];

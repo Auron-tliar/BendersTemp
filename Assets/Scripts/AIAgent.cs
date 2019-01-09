@@ -19,8 +19,11 @@ public class AIAgent : Agent {
     public bool isInTrainingCamp = false;
 
     public float randomActionProbabiliy = 0.0f;
+    public int noActionInterval = 0;
 
     private float downsampleFactorCorrection = downsampleFactor; //*1.2f;
+
+    private int actionCounter = 0;
 
     public override void InitializeAgent()
     {
@@ -302,12 +305,15 @@ public class AIAgent : Agent {
                 selectedAction = Random.Range(0, 5);
             }
         }
-        
 
-        //if (selectedAction == 0)
-        //    AddReward(-1);
-
-        //Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
+        if (selectedAction == 0 && noActionInterval > 0)
+        {
+            actionCounter += 1;
+            if (actionCounter % noActionInterval != 0)
+            {
+                return;
+            }
+        }
 
         try
         {
