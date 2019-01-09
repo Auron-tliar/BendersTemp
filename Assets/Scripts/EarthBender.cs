@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EarthBender : Bender
 {
-    //public GameObject WaterPushPrefab;
+    public GameObject EarthPushPrefab;
 
     private float _startTime;
 
@@ -28,6 +28,19 @@ public class EarthBender : Bender
 
     protected override void Cast()
     {
-        throw new System.NotImplementedException();
+        switch (State)
+        {
+            case States.Casting1:
+            case States.Casting2:
+                Projectile projectilePush = Instantiate(EarthPushPrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectilePush.SetDirection(transform.forward);
+                FinishCast();
+                break;
+            case States.Casting3:
+                break;
+            default:
+                break;
+        }
     }
 }
