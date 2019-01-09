@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
+    path: Assets/_Scenes/TrainingCamp2.unity
+    guid: e64804fdc5d380641ab5903fee617861
+  - enabled: 0
     path: Assets/_Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Scenes/TrainingCamp.unity
     guid: 9a9e676c5ac05ed40b5bc3462ee53f50
   - enabled: 1
