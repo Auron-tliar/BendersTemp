@@ -16,12 +16,12 @@ def create_network(input_vec, num_inputs, num_outputs, name, observation_header_
     if True:
         w = int(sqrt(num_inputs))
         x = tf.reshape(input_vec[:, observation_header_size:], (-1, w, w, 1))
-        x = Conv2D(128, 3, name='conv1')(x)
-        x = Conv2D(128, 3, name='conv2')(x)
+        x = Conv2D(128, 3, name='conv1'+name)(x)
+        x = Conv2D(128, 3, name='conv2'+name)(x)
         #x = Conv2D(128, 3, name='conv3')(x)
-        x = Dense(128, name="dense3")(x)
+        x = Dense(128, name="dense3"+name)(x)
         x = tf.layers.Flatten()(x)
-        output = Dense(num_outputs, activation=None, name='output_layer')(x)
+        output = Dense(num_outputs, activation=None, name='output_layer'+name)(x)
     else:
         w = int(sqrt(num_inputs))
         x = tf.reshape(input_vec[:, observation_header_size:], (-1, w, w, 1))
@@ -52,9 +52,10 @@ class DQNAgent:
         self.batch_size = batch_size
 
         self.qnet = lambda input_vec: create_network(input_vec, self.observation_size, self.action_size, 'qnet_' + agent_name)
+        self.agent_name = agent_name
 
         # self.qnet_optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate, decay=0.99, epsilon=0.01)
-        self.qnet_optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
+        self.qnet_optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate, name=agent_name+'_optimizer')
 
         self.epsilon = tf.Variable(initial_value=tf.constant(0.7), dtype=tf.float32, trainable=False)  # exploration rate
 
@@ -69,7 +70,7 @@ class DQNAgent:
             model = qnet(input_vec)
 
         if trainable:
-            with tf.name_scope('model_loss'):
+            with tf.name_scope(self.agent_name+'model_loss'):
 
                 # ERROR CLIPPING
                 error = tf.abs(model - reference)

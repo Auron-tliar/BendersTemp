@@ -74,10 +74,11 @@ def main():
     observation_size = len(env.observation_space.low)
     action_size = len(env.action_space.low)
 
-    minibatch_size = 128
+    minibatch_size = 64
     total_step_count = 100000
 
     agent = DQNAgent('bender_agent', observation_size, action_size, minibatch_size)
+    agent2 = DQNAgent('bender_agent2', observation_size, action_size, minibatch_size)
 
     model_input = tf.placeholder(shape=[None, observation_size], dtype=tf.float32, name="vector_observation")
 
@@ -96,9 +97,11 @@ def main():
         print('num_agents: '+str(num_agents))
 
         agents_act_commands = [agent.act(model_input[agent_idx]) for agent_idx in range(num_agents)]
+        agents_act_commands[-1] = agent2.act(model_input[num_agents-1])
 
         minibatch = tf.placeholder(shape=[minibatch_size, observation_size*2 + 2], dtype=tf.float32, name="history")
         history_replay_action = list(agent.replay(minibatch))
+        history_replay_action.append(agent2.replay(minibatch))
         history_replay_action.append(agent.update_epsilon())
 
         history = []  # (-1, observation_size*2 + 2)
@@ -154,7 +157,7 @@ def main():
             if step % 3 == 0:
                 if len(history) >= minibatch_size:
                     random_minibatch = np.array(history)[np.random.choice(len(history), size=minibatch_size, replace=False), :]
-                    _, model_loss, epsilon = sess.run(history_replay_action, feed_dict={minibatch: random_minibatch})
+                    _, model_loss, model_loss2, epsilon = sess.run(history_replay_action, feed_dict={minibatch: random_minibatch})
 
                     print("step: {}, model_loss: {} reward: {} sel_action: {} epsilon: {}".format(step, model_loss, np.mean(rewards), sel_action, epsilon))
 

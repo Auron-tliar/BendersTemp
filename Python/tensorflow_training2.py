@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from tensorflow.python.tools import freeze_graph
 import pickle
 
-from tensorflow_test import plot_observations
+from tensorflow_training import plot_observations
 
 result_dir = 'results2'
 
@@ -66,7 +66,7 @@ def main():
 
         observations, rewards, done, info = env.step(list(action_vecs))
 
-        time.sleep(0.5)
+        time.sleep(0.01)
 
 
 if __name__ == '__main__':

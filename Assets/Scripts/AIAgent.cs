@@ -6,9 +6,9 @@ public class AIAgent : Agent {
     public static float downsampleFactor = 0.08f;
     
 
-    private Bender bender;
+    public Bender bender;
     private Bender[] enemies;
-    private AIController enemyController;
+    private PlayerController enemyController;
     private Terrain terrain;
 
     private Bender template;
@@ -24,18 +24,19 @@ public class AIAgent : Agent {
 
     public override void InitializeAgent()
     {
-        bender = GetComponentInChildren<Bender>();
+        if (bender == null)
+            bender = GetComponentInChildren<Bender>();
 
         bender.gameObject.SetActive(false);
         template = Instantiate(bender, transform.parent);
         //template.NavAgent.enabled = false;
 
         // Find enemy controller
-        AIController[] controllers = Component.FindObjectsOfType<AIController>();
+        /*AIController[] controllers = Component.FindObjectsOfType<AIController>();
         var controller = controllers.First((x) => x != bender.Owner);
         enemies = controller.GetComponentsInChildren<Bender>();
 
-        terrain = Terrain.activeTerrain;
+        terrain = Terrain.activeTerrain;*/
 
         initialPosition = transform.position;
 
@@ -50,9 +51,12 @@ public class AIAgent : Agent {
         Vector3 newPosition;
         Quaternion newAngle;
 
-        if (isInTrainingCamp && Terrain.activeTerrain != null)
+        if (terrain == null)
+            terrain = Terrain.activeTerrain;
+
+        if (isInTrainingCamp && terrain != null)
         {
-            newPosition = Terrain.activeTerrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
+            newPosition = terrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
             newAngle = Quaternion.AngleAxis(Random.Range(0.0f, 360.0f), Vector3.up);
         }
         else
@@ -82,8 +86,8 @@ public class AIAgent : Agent {
 
         // TODO: Dependent on how agent reset is called
         // Find enemy controller
-        AIController[] enemyControllers = FindObjectsOfType<AIController>();
-        enemyController = enemyControllers.First((x) => x != controller);
+        //AIController[] enemyControllers = FindObjectsOfType<AIController>();
+        enemyController = null;
 
         //enemies = enemyController.GetComponentsInChildren<Bender>();
         enemies = null; // don't set it here because the other controller will delete its benders when resetting the scene
@@ -176,7 +180,16 @@ public class AIAgent : Agent {
 
 
         if (enemies == null) {
-            enemies = enemyController.GetComponentsInChildren<Bender>();
+            try
+            {
+                PlayerController[] enemyControllers = FindObjectsOfType<PlayerController>();
+                enemyController = enemyControllers.First((x) => x != bender.Owner);
+                enemies = enemyController.GetComponentsInChildren<Bender>();
+            }
+            catch
+            {
+               Debug.Log("Failed to get enemeies!!");
+            }
         }
 
         if (enemies != null)
@@ -231,26 +244,28 @@ public class AIAgent : Agent {
             AddReward(100);
         }*/
 
-        foreach (var enemy in enemies)
-        {
-            if (!enemy.IsDefeated() && enemy.IsHit())
+        if (enemies != null) { 
+            foreach (var enemy in enemies)
             {
-                AddReward(2);
-            }
-            if (enemy.IsHit() && enemy.IsDefeated())
-            {
-                AddReward(3);
-            }
-
-            if (bender != null && enemy != null && !bender.IsDefeated())
-            {
-                float angle = Vector3.Angle((enemy.transform.position - bender.transform.position), bender.transform.forward);
-                if (angle < 10f)
+                if (!enemy.IsDefeated() && enemy.IsHit())
                 {
-                    //Debug.Log("looking at enemy!");
-                    AddReward(1);
-                    bender.RotationSpeedInput = 0f;
-                    bender.transform.LookAt(enemy.transform);
+                    AddReward(2);
+                }
+                if (enemy.IsHit() && enemy.IsDefeated())
+                {
+                    AddReward(3);
+                }
+
+                if (bender != null && enemy != null && !bender.IsDefeated())
+                {
+                    float angle = Vector3.Angle((enemy.transform.position - bender.transform.position), bender.transform.forward);
+                    if (angle < 10f)
+                    {
+                        //Debug.Log("looking at enemy!");
+                        AddReward(1);
+                        bender.RotationSpeedInput = 0f;
+                        bender.transform.LookAt(enemy.transform);
+                    }
                 }
             }
         }
