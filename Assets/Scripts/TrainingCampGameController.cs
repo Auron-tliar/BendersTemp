@@ -113,11 +113,11 @@ public class TrainingCampGameController: MonoBehaviour
                     aiAgentTemplate.AddComponent<AIAgent>();
                     aiAgentTemplate.GetComponent<AIAgent>().brain = brain;
                     aiAgentTemplate.GetComponent<AIAgent>().isInTrainingCamp = true;
-                    aiAgentTemplate.GetComponent<AIAgent>().randomActionProbabiliy = 0.2f;
+                    //aiAgentTemplate.GetComponent<AIAgent>().randomActionProbabiliy = 0.2f;
 
                     GameObject aiAgent = Instantiate(aiAgentTemplate, SpawnPoints[i].GetChild(j).position, SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
                    
-                    Instantiate(temp, SpawnPoints[i].GetChild(j).position, SpawnPoints[i].GetChild(j).rotation, aiAgent.transform);
+                    Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);
 
                     aiAgent.SetActive(true);
 
