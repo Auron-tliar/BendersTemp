@@ -147,7 +147,7 @@ public abstract class Bender : MonoBehaviour
         }
     }
 
-    protected void Start()
+    protected virtual void Start()
     {
         _vulnerability = 1.0f;
         _rotation = transform.rotation.eulerAngles.y;
