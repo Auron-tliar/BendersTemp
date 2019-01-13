@@ -81,6 +81,11 @@ public abstract class Bender : MonoBehaviour
 
     protected States _frozenPrevState = States.Idle;
 
+    protected bool _isHit = false;
+    protected bool _isDefeated = false;
+
+    private int _recoveringCounter = 0;
+
     public BenderIconController IconObject
     {
         get
@@ -105,9 +110,16 @@ public abstract class Bender : MonoBehaviour
         {
             _owner = value;
 
-            Color baseColor = Owner.PlayerColor;
-            baseColor.a = 0.5f;
-            Base.GetComponent<Renderer>().material.color = baseColor;
+            try
+            {
+                Color baseColor = _owner.PlayerColor;
+                baseColor.a = 0.5f;
+                Base.GetComponent<Renderer>().material.color = baseColor;
+            }
+            catch
+            {
+
+            }
         }
     }
 
@@ -135,7 +147,7 @@ public abstract class Bender : MonoBehaviour
         }
     }
 
-    protected void Start()
+    protected virtual void Start()
     {
         _vulnerability = 1.0f;
         _rotation = transform.rotation.eulerAngles.y;
@@ -146,8 +158,20 @@ public abstract class Bender : MonoBehaviour
     {
         if (State != States.Idle && State != States.Moving)
         {
-            return;
+            if (_recoveringCounter > 20)
+            {
+                _recoveringCounter = 0;
+                State = States.Idle;
+            }
+            else
+            {
+                _recoveringCounter += 1;
+                return;
+            }
         }
+
+        if (Owner == null)
+            return;
 
         if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
@@ -187,7 +211,7 @@ public abstract class Bender : MonoBehaviour
                     break;
             }
             AbilitySelector = -1;
-            
+
             _rotation += RotationSpeedInput * StandardRotationSpeed * Time.deltaTime;
             _rigidbody.rotation = (Quaternion.Euler(new Vector3(0f, _rotation, 0f)));
             if (_rigidbody.velocity.magnitude <= 0.01 && _rigidbody.velocity.y <= Mathf.Epsilon)
@@ -196,19 +220,20 @@ public abstract class Bender : MonoBehaviour
             }
             _rigidbody.velocity = transform.forward * SpeedInput * StandardSpeed;
         }
-        
+
         if (((Owner.Type == PlayerController.PlayerTypes.AI || Owner.Type == PlayerController.PlayerTypes.HumanKeyBoard) && Mathf.Abs(SpeedInput) > 0.01) ||
             ((Owner.Type == PlayerController.PlayerTypes.HumanMouse) && NavAgent.velocity.magnitude > 0.01))
         {
             BenderAnimator.SetBool("Moving", true);
             State = States.Moving;
+            _isHit = false;
         }
         else
         {
             BenderAnimator.SetBool("Moving", false);
             State = States.Idle;
+            _isHit = false;
         }
-
     }
 
     public void StartAbility(States state, int number)
@@ -251,11 +276,26 @@ public abstract class Bender : MonoBehaviour
             BenderAnimator.SetBool("Moving", false);
             _frozenPrevState = States.Recovering;
         }
+
+        _isHit = true;
     }
 
     public bool IsHit()
     {
-        return !BenderAnimator.GetBool("Moving");
+        /*try
+        {
+            return !BenderAnimator.GetBool("Moving");
+        }
+        catch
+        {
+            return false;
+        }*/
+        return _isHit;
+    }
+
+    public bool IsDefeated()
+    {
+        return _isDefeated;
     }
 
     public void GotRevived()
@@ -343,7 +383,9 @@ public abstract class Bender : MonoBehaviour
 
     public void Defeat()
     {
-        IconObject.RemovedMask.SetActive(true);
+        if (IconObject != null)
+            IconObject.RemovedMask.SetActive(true);
+
         if (Owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             HumanControllerMouse hc = Owner.GetComponent<HumanControllerMouse>();
@@ -352,6 +394,8 @@ public abstract class Bender : MonoBehaviour
                 hc.Selection = null;
             }
         }
+
+        _isDefeated = true;
 
         Debug.Log(name + " defeated");
         Destroy(gameObject);

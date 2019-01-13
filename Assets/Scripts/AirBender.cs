@@ -13,7 +13,7 @@ public class AirBender : Bender
     private float _startTime;
     private float _keptStSpeed;
 
-    private new void Start()
+    protected override void Start()
     {
         base.Start();
         BuffParticleSystem.Stop();
@@ -21,15 +21,6 @@ public class AirBender : Bender
         mod.duration = SpeedBuffDuration;
     }
 
-    /*private new void Update()
-    {
-        if (Time.time - _startTime >= 2f)
-        {
-            
-        }
-
-        base.Update();
-    }*/
 
     protected override void Cast()
     {

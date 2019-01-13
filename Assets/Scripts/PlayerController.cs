@@ -28,13 +28,17 @@ public abstract class PlayerController : MonoBehaviour
             Bender bender = benders[i];
             bender.Owner = this;
 
-            //if (Type == PlayerTypes.HumanKeyBoard)
-            //{
-            BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
-            icon.DependentBender = bender;
-            bender.IconObject = icon;
-            bender.NavAgent.enabled = false;
-            //}
+            if (UIIconContainer != null && bender.isActiveAndEnabled)
+            {
+                BenderIconController icon = Instantiate(IconPrefab, UIIconContainer).GetComponent<BenderIconController>();
+                icon.DependentBender = bender;
+                bender.IconObject = icon;
+            }
+
+            if (Type != PlayerTypes.HumanMouse)
+            {
+                bender.NavAgent.enabled = false;
+            }
         }
     }
 }

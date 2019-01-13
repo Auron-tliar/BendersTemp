@@ -73,6 +73,7 @@ public class HumanControllerMouse : HumanController
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, 100f, MovementLayer))
             {
                 Instantiate(ClickMark, hit.point, new Quaternion());
+
                 if (!_selection.NavAgent.isStopped)
                 {
                     _selection.NavAgent.SetDestination(hit.point);

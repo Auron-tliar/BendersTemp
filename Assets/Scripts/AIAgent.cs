@@ -1,4 +1,4 @@
-﻿using MLAgents;
+using MLAgents;
 using System.Linq;
 using UnityEngine;
 
@@ -6,9 +6,9 @@ public class AIAgent : Agent {
     public static float downsampleFactor = 0.08f;
     
 
-    private Bender bender;
+    public Bender bender;
     private Bender[] enemies;
-    private AIController enemyController;
+    private PlayerController enemyController;
     private Terrain terrain;
 
     private Bender template;
@@ -16,37 +16,72 @@ public class AIAgent : Agent {
     private Vector3 initialPosition;
     private bool useTerrainHeights = false;
 
+    public bool isInTrainingCamp = false;
+
+    public float randomActionProbabiliy = 0.0f;
+    public int noActionInterval = 0;
+
+    private float downsampleFactorCorrection = downsampleFactor; //*1.2f;
+
+    private int actionCounter = 0;
+
     public override void InitializeAgent()
     {
-        bender = GetComponentInChildren<Bender>();
+        if (bender == null)
+            bender = GetComponentInChildren<Bender>();
 
-        template = Instantiate(bender);
-        template.gameObject.SetActive(false);
+        bender.gameObject.SetActive(false);
+        template = Instantiate(bender, transform.parent);
+        //template.NavAgent.enabled = false;
 
         // Find enemy controller
-        AIController[] controllers = Component.FindObjectsOfType<AIController>();
+        /*AIController[] controllers = Component.FindObjectsOfType<AIController>();
         var controller = controllers.First((x) => x != bender.Owner);
         enemies = controller.GetComponentsInChildren<Bender>();
-         
-        terrain = Terrain.activeTerrain;
 
-        initialPosition = bender.transform.position;
+        terrain = Terrain.activeTerrain;*/
+
+        initialPosition = transform.position;
+
+        AgentReset();
     }
 
 
     public override void AgentReset()
     {
         Debug.Log("Resetting agent " + name);
-        Vector3 newPosition = initialPosition; //bender.transform.position;
-        newPosition.y = terrain.SampleHeight(newPosition);
+
+        Vector3 newPosition;
+        Quaternion newAngle;
+
+        if (terrain == null)
+            terrain = Terrain.activeTerrain;
+
+        if (isInTrainingCamp && terrain != null)
+        {
+            newPosition = terrain.transform.position + (new Vector3(Random.Range(0.0f, 40.0f), 0, Random.Range(00.0f, 50.0f)));
+            newAngle = Quaternion.AngleAxis(Random.Range(0.0f, 360.0f), Vector3.up);
+        }
+        else
+        {
+            newPosition = initialPosition;
+            newAngle = transform.rotation;
+        }
+
+        newPosition.y += terrain.SampleHeight(newPosition);
 
         var controller = bender.Owner;
 
         // Recreate the bender
         // TODO: Wasteful, should reuse bender if possible
-        if (bender != null) Destroy(bender.gameObject);
-        bender = Instantiate(template, newPosition, Quaternion.identity, transform);
+        if (bender != null)
+        {
+            Destroy(bender.gameObject);
+        }
+
+        bender = Instantiate(template, newPosition, newAngle, transform);
         bender.gameObject.SetActive(true);
+        bender.NavAgent.enabled = false;
         bender.Owner = controller;
 
         //bender.transform.position = newPosition;
@@ -54,11 +89,12 @@ public class AIAgent : Agent {
 
         // TODO: Dependent on how agent reset is called
         // Find enemy controller
-        AIController[] enemyControllers = FindObjectsOfType<AIController>();
-        enemyController = enemyControllers.First((x) => x != controller);
+        //AIController[] enemyControllers = FindObjectsOfType<AIController>();
+        enemyController = null;
 
         //enemies = enemyController.GetComponentsInChildren<Bender>();
         enemies = null; // don't set it here because the other controller will delete its benders when resetting the scene
+
     }
 
 
@@ -72,10 +108,11 @@ public class AIAgent : Agent {
 
 
         // Set observation memory
-        int observationSize = width * height + 3;
+        int observationSize = width * height + 4;
+        float isDefeated = bender.IsDefeated() ? 1.0f : 0.0f;
 
         // add general information header
-        AddVectorObs(new float[] { (float)bender.BenderType, width, height });
+        AddVectorObs(new float[] { (float)bender.BenderType, width, height, isDefeated});
 
         if (useTerrainHeights)
         {
@@ -87,44 +124,107 @@ public class AIAgent : Agent {
         }
 
         brain.brainParameters.vectorObservationSize = observationSize;
-        Debug.Log("observationSize:" + observationSize);
+        //Debug.Log("observationSize:" + observationSize);
         //Debug.Log("BenderType:" + (float)bender.BenderType);
         //Debug.Log("width:" + width);
         //Debug.Log("height:" + height);
 
 
         // Enemy grid
+        float[] enemyGrid = new float[width * height];
+        enemyGrid.Fill(-0.2f);
+
+        try
+        {
+            if (bender.transform == null)
+            {
+                AddVectorObs(enemyGrid);
+                return;
+            }
+        }
+        catch
+        {
+            AddVectorObs(enemyGrid);
+            return;
+        }
+
 
         // Subtract the position of the bender to have relative enemy positions
         Vector3 position = bender.transform.position;
+        Vector3 terrainPosition = terrain.transform.position;
         float y_rotation = bender.transform.rotation.eulerAngles.y;
+        Quaternion rotation = Quaternion.Inverse(bender.transform.rotation);
 
-        Debug.Log("y_rotation:" + y_rotation);
+        //Debug.Log("y_rotation:" + y_rotation);
 
-        float[] enemyGrid = new float[width * height];
+        Vector3 p = new Vector3(0, 0, 0);
+
+        for (int y = 0; y < terrain.terrainData.size.z; y++)
+        {
+            for (int x = 0; x < terrain.terrainData.size.x; x++)
+            {
+                p.Set(x, 0, y);
+                p = p + terrainPosition - position;
+                p = (rotation * p);
+
+                float pX = p.x / sampleScale.x * downsampleFactorCorrection;
+                float pY = p.z / sampleScale.z * downsampleFactorCorrection;
+
+                Vector2Int samplePosition = new Vector2Int((int)((pX + width) / 2), (int)(pY + height) / 2);
+
+                //Debug.Log(enemySamplePosition);
+
+                int grid_pos = samplePosition.x * height + samplePosition.y;
+
+                if (grid_pos >= 0 && grid_pos < width * height && samplePosition.y >= 0 && samplePosition.y < height)
+                    enemyGrid[grid_pos] = 0;
+            }
+        }
+
 
         if (enemies == null) {
-            enemies = enemyController.GetComponentsInChildren<Bender>();
+            try
+            {
+                PlayerController[] enemyControllers = FindObjectsOfType<PlayerController>();
+                enemyController = enemyControllers.First((x) => x != bender.Owner);
+                enemies = enemyController.GetComponentsInChildren<Bender>();
+            }
+            catch
+            {
+               Debug.Log("Failed to get enemeies!!");
+            }
         }
 
         if (enemies != null)
         {
             foreach (var enemy in enemies)
             {
-                if (enemy != null)
+                if (enemy != null && !enemy.IsDefeated())
                 {
                     Vector3 enemyPosition = enemy.transform.position;
                     enemyPosition -= position;
 
-                    enemyPosition = bender.transform.rotation * enemyPosition;
+                    enemyPosition = rotation * enemyPosition;
 
-                    float enemyX = enemyPosition.x / sampleScale.x * downsampleFactor;
-                    float enemyY = enemyPosition.z / sampleScale.z * downsampleFactor;
+                    float enemyX = enemyPosition.x / sampleScale.x * downsampleFactorCorrection;
+                    float enemyY = enemyPosition.z / sampleScale.z * downsampleFactorCorrection;
                     Vector2Int enemySamplePosition = new Vector2Int((int)((enemyX+width)/2), (int)(enemyY+height)/2);
 
-                    Debug.Log(enemySamplePosition);
+                    //Debug.Log(enemySamplePosition);
 
-                    enemyGrid[enemySamplePosition.x * height + enemySamplePosition.y] += 1;
+                    int grid_pos = enemySamplePosition.x * height + enemySamplePosition.y;
+
+                    if (grid_pos >= 0 && grid_pos < width * height && enemySamplePosition.y >= 0 && enemySamplePosition.y < height)
+                    {
+                        if (enemyGrid[grid_pos] < 0)
+                        {
+                            enemyGrid[grid_pos] = 1;
+                        }
+                        else
+                        {
+                            enemyGrid[grid_pos] += 1;
+                        }
+                    }
                 }
             }
         }
@@ -136,60 +236,113 @@ public class AIAgent : Agent {
 
     public override void AgentAction(float[] vectorAction, string textAction)
     {
+        SetReward(0);
+
         // Time constraint
         // AddReward(-1);
 
         // Killed all enemies
-        if (enemies.Length == 0) {
+        /*if (enemies.Length == 0) {
             Done();
             AddReward(100);
+        }*/
+
+        if (enemies != null) { 
+            foreach (var enemy in enemies)
+            {
+                if (!enemy.IsDefeated() && enemy.IsHit())
+                {
+                    AddReward(2);
+                }
+                if (enemy.IsHit() && enemy.IsDefeated())
+                {
+                    AddReward(3);
+                }
+
+                if (bender != null && enemy != null && !bender.IsDefeated())
+                {
+                    float angle = Vector3.Angle((enemy.transform.position - bender.transform.position), bender.transform.forward);
+                    if (angle < 10f)
+                    {
+                        //Debug.Log("looking at enemy!");
+                        AddReward(1);
+                        bender.RotationSpeedInput = 0f;
+                        bender.transform.LookAt(enemy.transform);
+                    }
+                }
+            }
         }
 
-        if (bender.IsHit())
+        if (bender == null || bender.IsDefeated())
+        {
+            //Done();
+            AddReward(-3f);
+        }
+
+
+        /*if (!bender.IsDefeated() && bender.IsHit())
         {
             AddReward(-1f);
-        }
-
-        if (bender == null)
-        {
-            Done();
-            AddReward(-100f);
-        }
+        }*/
 
 
         // Perform actions
         if (bender.State != Bender.States.Idle && bender.State != Bender.States.Moving)
         {
             // Penalize if choosing action in wrong state
-            AddReward(-1);
+            //AddReward(-1);
             return;
         }
 
         int selectedAction = MaxIndex(vectorAction);
 
-        if (selectedAction == 0)
-            AddReward(-1);
-
-        //Debug.Log("vectorAction:" + string.Join(", ", vectorAction));
-
-        switch (selectedAction)
+        if (randomActionProbabiliy > 0f)
         {
-            case 1:
-                bender.StartAbility(Bender.States.Casting1, 0); break;
-            case 2:
-                bender.StartAbility(Bender.States.Casting2, 1); break;
-            case 3:
-                bender.StartAbility(Bender.States.Casting3, 2); break;
-            case 4:
-                bender.SpeedInput = 2f; break;
-            case 5:
-                bender.SpeedInput = -2f; break;
-            case 6:
-                bender.RotationSpeedInput = 5f; break;
-            case 7:
-                bender.RotationSpeedInput = -5f; break;
-            default:
-                break;
+            //Random.InitState((int)System.DateTime.Now.Ticks);
+
+            if (Random.Range(0.0f, 1.0f) < randomActionProbabiliy)
+            {
+                selectedAction = Random.Range(0, 5);
+            }
+        }
+
+        if (selectedAction == 0 && noActionInterval > 0)
+        {
+            actionCounter += 1;
+            if (actionCounter % noActionInterval != 0)
+            {
+                return;
+            }
+        }
+
+        try
+        {
+            switch (selectedAction)
+            {
+                case 0:
+                    if (bender.BenderType == Bender.BenderTypes.Air)
+                        bender.StartAbility(Bender.States.Casting2, 0);
+                    else bender.StartAbility(Bender.States.Casting1, 0);
+                    break;
+                case 1:
+                    bender.SpeedInput = 1f; break;
+                case 2:
+                    bender.SpeedInput = -1f; break;
+                case 3:
+                    bender.RotationSpeedInput = 0.5f; break;
+                case 4:
+                    bender.RotationSpeedInput = -0.5f; break;
+                case 5:
+                    bender.StartAbility(Bender.States.Casting2, 1); break;
+                case 6:
+                    bender.StartAbility(Bender.States.Casting3, 2); break;
+                default:
+                    break;
+            }
+        }
+        catch
+        {
+            Debug.Log("could not execute action: "+selectedAction);
         }
 
     }

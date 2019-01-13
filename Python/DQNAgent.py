@@ -1,11 +1,36 @@
+from math import sqrt
+
 import tensorflow as tf
 import numpy as np
 
 
-def create_network(input_vec, num_inputs, num_outputs, name):
-    dense1 = tf.layers.dense(input_vec, 128, activation=tf.nn.relu, name="dense1", reuse=tf.AUTO_REUSE)
-    dense2 = tf.layers.dense(dense1, 128, activation=tf.nn.relu, name="dense2", reuse=tf.AUTO_REUSE)
-    output = tf.layers.dense(dense2, num_outputs, activation=None, name="output_layer", reuse=tf.AUTO_REUSE)
+def Dense(units, activation='relu', name=None):
+    return lambda inputs: tf.layers.dense(inputs, units, activation=activation, kernel_initializer=tf.glorot_uniform_initializer(), name=name, reuse=tf.AUTO_REUSE)
+
+
+def Conv2D(filters, kernel_size, name):
+    return lambda inputs: tf.layers.conv2d(inputs, filters, (kernel_size, kernel_size), activation='relu', kernel_initializer=tf.glorot_uniform_initializer(), name=name, reuse=tf.AUTO_REUSE)
+
+
+def create_network(input_vec, num_inputs, num_outputs, name, observation_header_size = 4):
+    if True:
+        w = int(sqrt(num_inputs))
+        x = tf.reshape(input_vec[:, observation_header_size:], (-1, w, w, 1))
+        x = Conv2D(128, 3, name='conv1'+name)(x)
+        x = Conv2D(128, 3, name='conv2'+name)(x)
+        #x = Conv2D(128, 3, name='conv3')(x)
+        x = Dense(128, name="dense3"+name)(x)
+        x = tf.layers.Flatten()(x)
+        output = Dense(num_outputs, activation=None, name='output_layer'+name)(x)
+    else:
+        w = int(sqrt(num_inputs))
+        x = tf.reshape(input_vec[:, observation_header_size:], (-1, w, w, 1))
+        x = Conv2D(128, 3, name='conv1')(x)
+        x = tf.layers.Flatten()(x)
+        x = Dense(128, name="dense1")(x)
+        x = Dense(128, name="dense2")(x)
+        x = Dense(128, name="dense3")(x)
+        output = Dense(num_outputs, activation=None, name='output_layer')(x)
 
     #output = tf.identity(output, name="action")
 
@@ -22,21 +47,22 @@ class DQNAgent:
         self.gamma = 0.9  # discount rate
 
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
+        self.epsilon_decay = 0.999
         self.learning_rate = 0.01
         self.batch_size = batch_size
 
         self.qnet = lambda input_vec: create_network(input_vec, self.observation_size, self.action_size, 'qnet_' + agent_name)
+        self.agent_name = agent_name
 
         # self.qnet_optimizer = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate, decay=0.99, epsilon=0.01)
-        self.qnet_optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
+        self.qnet_optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate, name=agent_name+'_optimizer')
 
         self.epsilon = tf.Variable(initial_value=tf.constant(0.7), dtype=tf.float32, trainable=False)  # exploration rate
 
     def define_model(self, qnet, input_vec, input_shape, reference=None, trainable=False, return_embedding=False):
         print('defining model')
 
-        input_vec = tf.reshape(tf.stop_gradient(tf.clip_by_value(input_vec, -1000.0, 1000.0)), (-1, input_shape))
+        input_vec = tf.reshape(tf.stop_gradient(tf.clip_by_value(input_vec, -10.0, 10.0)), (-1, input_shape))
 
         if return_embedding:
             return qnet(input_vec, return_embedding=True)
@@ -44,7 +70,7 @@ class DQNAgent:
             model = qnet(input_vec)
 
         if trainable:
-            with tf.name_scope('model_loss'):
+            with tf.name_scope(self.agent_name+'model_loss'):
 
                 # ERROR CLIPPING
                 error = tf.abs(model - reference)
@@ -89,6 +115,17 @@ class DQNAgent:
     def predict(self, state):
         return self.define_model(self.qnet, state, self.observation_size, trainable=False)
 
+    def random_predict(self, state, eps):
+        cond = tf.less_equal(tf.random_uniform(shape=[1]), eps)[0]
+
+        random_action = lambda: tf.one_hot(tf.random_uniform(shape=[1], minval=0, maxval=self.action_size, dtype=tf.int32)[0], self.action_size)
+
+        def prediction_action():
+            act_values = self.define_model(self.qnet, tf.reshape(state, (1, -1)), self.observation_size)[0]
+            return act_values
+
+        return tf.cond(cond, random_action, prediction_action)
+
     def target_qnet_predict(self, state):
         return self.define_model(self.target_qnet, state, self.observation_size, trainable=False)
 
@@ -120,6 +157,9 @@ class DQNAgent:
 
     def update_epsilon(self):
         return tf.cond(tf.greater(self.epsilon, self.epsilon_min), lambda: tf.assign(self.epsilon, self.epsilon * self.epsilon_decay), lambda: self.epsilon)
+
+    def reset_epsilon(self, value):
+        return tf.assign(self.epsilon, value)
 
     def get_embeddings(self, states):
         return self.define_model(self.qnet, states, self.observation_size, trainable=False, return_embedding=True)

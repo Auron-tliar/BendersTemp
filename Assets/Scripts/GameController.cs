@@ -23,11 +23,15 @@ public class GameController : MonoBehaviour
     public GameObject HumanKeyboardPlayerPrefab;
     public GameObject AIPlayerPrefab;
 
+    public GameObject AIAgentPrefab;
+
     [Header("Bender Prefabs")]
     public GameObject AirBenderPrefab;
     public GameObject EarthBenderPrefab;
     public GameObject FireBenderPrefab;
     public GameObject WaterBenderPrefab;
+
+    public MLAgents.Brain brain;
 
     private int _currentTrack = -1;
 
@@ -55,7 +59,9 @@ public class GameController : MonoBehaviour
                 default:
                     break;
             }
+            PlayerControllers[i].PlayerColor = MatchSettings.PlayerColors[i];
             PlayerControllers[i].UIIconContainer = BenderIconPanels[i];
+            
             for (int j = 0; j < MatchSettings.Players[i].Count; j++)
             {
                 GameObject temp;
@@ -77,10 +83,36 @@ public class GameController : MonoBehaviour
                         temp = null;
                         break;
                 }
-                Instantiate(temp, SpawnPoints[i].GetChild(j).position,
-                    SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
+
+
+                if (MatchSettings.PlayerTypes[i] == PlayerController.PlayerTypes.AI)
+                {
+                    //temp.SetActive(false);
+
+                    AIAgentPrefab.SetActive(false);
+
+                    GameObject aiAgent = Instantiate(AIAgentPrefab, SpawnPoints[i].GetChild(j).position, SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
+
+                    aiAgent.GetComponent<AIAgent>().brain = brain;
+                    //aiAgent.GetComponent<AIAgent>().randomActionProbabiliy = 0.1f;
+                    aiAgent.GetComponent<AIAgent>().noActionInterval = 10;
+
+                    GameObject bender = Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);
+                    bender.GetComponent<Bender>().Owner = PlayerControllers[i];
+
+                    aiAgent.GetComponent<AIAgent>().bender = bender.GetComponent<Bender>();
+
+                    //bender.SetActive(true);
+
+                    aiAgent.SetActive(true);
+                }
+                else
+                {
+                    Instantiate(temp, SpawnPoints[i].GetChild(j).position,
+                        SpawnPoints[i].GetChild(j).rotation, PlayerControllers[i].transform);
+                }
             }
-            PlayerControllers[i].PlayerColor = MatchSettings.PlayerColors[i];
+            
         }
     }
 
