@@ -6,7 +6,7 @@ public class WaterRevive : Projectile
 {
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.tag == "Bender")
+        if (collider.tag == "Bender" && _caster != collider.GetComponent<Bender>().Name)
         {
             Bender bender = collider.GetComponent<Bender>();
 

@@ -8,10 +8,15 @@ public class TextMirror : MonoBehaviour
 {
     private void Start()
     {
-        TextMeshProUGUI[] temp = GetComponentsInChildren<TextMeshProUGUI>();
-        foreach (TextMeshProUGUI t in temp)
+        //TextMeshProUGUI[] temp;
+        foreach (Transform child in transform)
         {
-            t.rectTransform.Rotate(Vector3.up, 180f);
+            child.GetComponentInChildren<TextMeshProUGUI>().rectTransform.Rotate(Vector3.up, 180f);
+            //temp = GetComponentsInChildren<TextMeshProUGUI>();
+            //foreach (TextMeshProUGUI t in temp)
+            //{
+            //    t.rectTransform.Rotate(Vector3.up, 180f);
+            //}
         }
     }
 }

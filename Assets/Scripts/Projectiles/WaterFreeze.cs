@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Push : Projectile
+public class WaterFreeze : Projectile
 {
-    public float Power = 10f;
+    public float Duration = 2f;
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.tag == "Bender")
+        if (collider.tag == "Bender" && _caster != collider.GetComponent<Bender>().Name)
         {
             Bender bender = collider.GetComponent<Bender>();
             //bender.NavAgent.SetDestination(transform.position);
@@ -16,8 +16,8 @@ public class Push : Projectile
             {
                 bender.NavAgent.isStopped = true;
             }
-            collider.attachedRigidbody.AddForce(_rigidbody.velocity * Power * bender.getVulnerability());
-            bender.GotHit();
+
+            bender.GotFrozen(Duration);
             PlayHitSound(bender.AudioSourcePlayer);
             Destroy(gameObject);
         }

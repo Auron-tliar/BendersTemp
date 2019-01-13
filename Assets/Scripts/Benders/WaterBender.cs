@@ -35,22 +35,23 @@ public class WaterBender : Bender
             case States.Casting1:
                 Projectile projectilePush = Instantiate(WaterPushPrefab, ProjectileSpawnPoint.position,
                     new Quaternion()).GetComponent<Projectile>();
-                projectilePush.SetDirection(transform.forward);
+                projectilePush.SetDirection(Name, transform.forward);
                 FinishCast();
                 break;
             case States.Casting2:
                 Projectile projectileFreeze = Instantiate(WaterFreezePrefab, ProjectileSpawnPoint.position,
                     new Quaternion()).GetComponent<Projectile>();
-                projectileFreeze.SetDirection(transform.forward);
+                projectileFreeze.SetDirection(Name, transform.forward);
                 FinishCast();
                 break;
             case States.Casting3:
                 Projectile projectileRevive = Instantiate(WaterRevivePrefab, ProjectileSpawnPoint.position,
                     new Quaternion()).GetComponent<Projectile>();
-                projectileRevive.SetDirection(transform.forward);
+                projectileRevive.SetDirection(Name, transform.forward);
                 FinishCast();
                 break;
             default:
+                Debug.Log(Name + ": Non-casting state during casting!");
                 break;
         }
     }

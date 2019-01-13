@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FireBender : Bender
+public class EarthBender : Bender
 {
-    public GameObject FirePushPrefab;
+    public GameObject EarthPushPrefab;
 
     private float _startTime;
 
@@ -15,6 +15,14 @@ public class FireBender : Bender
 
     private new void Update()
     {
+        /*if (Time.time - _startTime >= 2f)
+        {
+            BenderAnimator.SetTrigger("Attack1Trigger");
+            AirPush projectile = Instantiate(AirPushPrefab, ProjectileSpawnPoint).GetComponent<AirPush>();
+            projectile.SetDirection(transform.forward);
+            _startTime = float.PositiveInfinity;
+        }*/
+
         base.Update();
     }
 
@@ -24,16 +32,12 @@ public class FireBender : Bender
         {
             case States.Casting1:
             case States.Casting2:
-                Projectile projectilePush = Instantiate(FirePushPrefab, ProjectileSpawnPoint.position,
+                Projectile projectilePush = Instantiate(EarthPushPrefab, ProjectileSpawnPoint.position,
                     new Quaternion()).GetComponent<Projectile>();
-                projectilePush.SetDirection(transform.forward);
+                projectilePush.SetDirection(Name, transform.forward);
                 FinishCast();
                 break;
             case States.Casting3:
-
-                // !!!!!!!!!!! Recover !!!!!!!!!!!!!!!! //
-
-                FinishCast();
                 break;
             default:
                 break;
