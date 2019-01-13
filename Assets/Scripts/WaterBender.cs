@@ -6,6 +6,7 @@ public class WaterBender : Bender
 {
     public GameObject WaterPushPrefab;
     public GameObject WaterFreezePrefab;
+    public GameObject WaterRevivePrefab;
 
     private float _startTime;
 
@@ -44,9 +45,9 @@ public class WaterBender : Bender
                 FinishCast();
                 break;
             case States.Casting3:
-
-                // !!!!!!!!!!! Recover !!!!!!!!!!!!!!!! //
-
+                Projectile projectileRevive = Instantiate(WaterRevivePrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectileRevive.SetDirection(transform.forward);
                 FinishCast();
                 break;
             default:
