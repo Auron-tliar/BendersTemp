@@ -39,6 +39,16 @@ public class MenuController : MonoBehaviour
     private void Start()
     {
         Background.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
+
+        if(MatchSettings.WinnerTeam.HasValue && MatchSettings.WinnerTeam.Value == 0)
+        {
+            GameObject title = GameObject.Find("Title");
+            title.GetComponent<Text>().text = "You won!";
+        } else if(MatchSettings.WinnerTeam.HasValue && MatchSettings.WinnerTeam.Value == 1)
+        {
+            GameObject title = GameObject.Find("Title");
+            title.GetComponent<Text>().text = "Game Over!";
+        }
     }
 
     public void NewMatch()

@@ -34,4 +34,6 @@ public static class MatchSettings
         PlayerController.PlayerTypes.AI
     };
 
+    public static int? WinnerTeam;
+
 }

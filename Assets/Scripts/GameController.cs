@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
     [HideInInspector]
     public List<PlayerController> PlayerControllers;
+
+    [HideInInspector]
+    public List<AIAgent> AiAgents;
 
     public AudioSource AudioPlayer;
     public List<AudioClip> BackgroundMusic;
@@ -95,7 +100,7 @@ public class GameController : MonoBehaviour
 
                     aiAgent.GetComponent<AIAgent>().brain = brain;
                     //aiAgent.GetComponent<AIAgent>().randomActionProbabiliy = 0.1f;
-                    aiAgent.GetComponent<AIAgent>().noActionInterval = 1000;
+                    aiAgent.GetComponent<AIAgent>().noActionInterval = 10;
 
                     GameObject bender = Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);
                     bender.GetComponent<Bender>().Owner = PlayerControllers[i];
@@ -105,6 +110,7 @@ public class GameController : MonoBehaviour
                     //bender.SetActive(true);
 
                     aiAgent.SetActive(true);
+
                 }
                 else
                 {
@@ -119,12 +125,30 @@ public class GameController : MonoBehaviour
     private void Update()
     {
         Minutes.text = ((int)Time.time / 60).ToString();
-        Seconds.text = ((int)Time.time % 60).ToString("D2");
+        Seconds.text = ((int)Time.time % 60).ToString();
 
         if (!AudioPlayer.isPlaying)
         {
             PlayNextTrack();
         }
+
+        int numAi = FindObjectsOfType<AIAgent>().Count((AIAgent ai) => ai.GetComponentInChildren<Bender>() != null);
+        int numPlayers = FindObjectsOfType<PlayerController>().Count((PlayerController player) => player.GetComponentInChildren<Bender>() != null);
+
+        Debug.Log(numAi);
+        Debug.Log(numPlayers);
+
+        if (numPlayers-1 == 0)
+        {
+            MatchSettings.WinnerTeam = 1;
+            SceneManager.LoadScene("Menu");
+        }
+        else if(numAi == 0)
+        {
+            MatchSettings.WinnerTeam = 0;
+            SceneManager.LoadScene("Menu");
+        }
+
     }
 
     private void PlayNextTrack()
