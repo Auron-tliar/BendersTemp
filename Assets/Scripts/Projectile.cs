@@ -10,6 +10,7 @@ public abstract class Projectile : MonoBehaviour
     
     protected Rigidbody _rigidbody;
     protected float _creationTime;
+    protected string _caster;
 
     private void Awake()
     {
@@ -21,8 +22,9 @@ public abstract class Projectile : MonoBehaviour
         _creationTime = Time.time;
     }
 
-    public void SetDirection(Vector3 direction)
+    public void SetDirection(string caster, Vector3 direction)
     {
+        _caster = caster;
         _rigidbody.velocity = direction * Speed;
     }
 

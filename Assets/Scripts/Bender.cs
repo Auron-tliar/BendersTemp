@@ -50,6 +50,9 @@ public abstract class Bender : MonoBehaviour
     public AudioClip AbilitySound;
     public Sprite PortraitSprite;
 
+    [Tooltip("Check that it is equal to the animation lenght!")]
+    public int RecoveringDuration = 55;
+
     [HideInInspector]
     public Animator BenderAnimator;
     [HideInInspector]
@@ -151,23 +154,32 @@ public abstract class Bender : MonoBehaviour
     {
         _vulnerability = 1.0f;
         _rotation = transform.rotation.eulerAngles.y;
+
     }
 
 
     protected void Update()
     {
+        Debug.Log(Name + ": [State]: " + State);
         if (State != States.Idle && State != States.Moving)
         {
-            if (_recoveringCounter > 20)
+            // Recovering should be regulated by the duration of the Death animation (or by triggering Revive trigger 
+            // by waterbender revive ability)
+
+            if (State == States.Recovering)
             {
-                _recoveringCounter = 0;
-                State = States.Idle;
+                if (_recoveringCounter > RecoveringDuration)
+                {
+                    _recoveringCounter = 0;
+                    State = States.Idle;
+                }
+                else
+                {
+                    _recoveringCounter += 1;
+                    return;
+                }
             }
-            else
-            {
-                _recoveringCounter += 1;
-                return;
-            }
+            return;
         }
 
         if (Owner == null)
@@ -260,6 +272,7 @@ public abstract class Bender : MonoBehaviour
     public void GotHit()
     {
         _vulnerability += 0.05f;
+        BenderAnimator.SetBool("Ability", false);
         if (State != States.Frozen)
         {
             BenderAnimator.SetTrigger("Hit");
@@ -269,6 +282,7 @@ public abstract class Bender : MonoBehaviour
             {
                 NavAgent.isStopped = true;
             }
+            Debug.Log(Name + ": Got hit!");
         }
         else
         {
@@ -305,6 +319,7 @@ public abstract class Bender : MonoBehaviour
 
     public void Recovered()
     {
+        _recoveringCounter = 0;
         State = States.Idle;
         if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
@@ -328,9 +343,10 @@ public abstract class Bender : MonoBehaviour
 
     public void FinishCast()
     {
+        Debug.Log(Name + ": Finish casting...");
         _audioSource.PlayOneShot(AbilitySound);
-        State = States.Idle;
         BenderAnimator.SetBool("Ability", false);
+        State = States.Idle;
         if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
             NavAgent.isStopped = false;

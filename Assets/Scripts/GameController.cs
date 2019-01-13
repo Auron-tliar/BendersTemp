@@ -95,7 +95,7 @@ public class GameController : MonoBehaviour
 
                     aiAgent.GetComponent<AIAgent>().brain = brain;
                     //aiAgent.GetComponent<AIAgent>().randomActionProbabiliy = 0.1f;
-                    aiAgent.GetComponent<AIAgent>().noActionInterval = 10;
+                    aiAgent.GetComponent<AIAgent>().noActionInterval = 1000;
 
                     GameObject bender = Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);
                     bender.GetComponent<Bender>().Owner = PlayerControllers[i];
@@ -119,7 +119,7 @@ public class GameController : MonoBehaviour
     private void Update()
     {
         Minutes.text = ((int)Time.time / 60).ToString();
-        Seconds.text = ((int)Time.time % 60).ToString();
+        Seconds.text = ((int)Time.time % 60).ToString("D2");
 
         if (!AudioPlayer.isPlaying)
         {

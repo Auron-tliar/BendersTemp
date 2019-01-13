@@ -2081,6 +2081,7 @@ MonoBehaviour:
   FallSound: {fileID: 8300000, guid: 8dfc580618850428e904fc73c87a36db, type: 3}
   AbilitySound: {fileID: 8300000, guid: 4c5b89070da23f9478f81037c1a9b03a, type: 3}
   PortraitSprite: {fileID: 21300000, guid: d84b3e8b0b6d5ef4088c797b5667ca78, type: 3}
+  RecoveringDuration: 55
   BenderAnimator: {fileID: 0}
   SpeedInput: 0
   RotationSpeedInput: 0
@@ -2089,6 +2090,8 @@ MonoBehaviour:
   WaterPushPrefab: {fileID: 1984157427519418, guid: 704cb4d43f90c594587174568f9cc4d2,
     type: 2}
   WaterFreezePrefab: {fileID: 1984157427519418, guid: 11b6b7b10c1a1d74aaa5b42a0b09575b,
+    type: 2}
+  WaterRevivePrefab: {fileID: 1984157427519418, guid: 5737afaa34d1fce4db1feae66b0bfc37,
     type: 2}
 --- !u!114 &114822063191562856
 MonoBehaviour:
