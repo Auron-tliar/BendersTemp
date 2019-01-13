@@ -100,7 +100,7 @@ public class GameController : MonoBehaviour
 
                     aiAgent.GetComponent<AIAgent>().brain = brain;
                     //aiAgent.GetComponent<AIAgent>().randomActionProbabiliy = 0.1f;
-                    aiAgent.GetComponent<AIAgent>().noActionInterval = 10;
+                    aiAgent.GetComponent<AIAgent>().noActionInterval = 20;
 
                     GameObject bender = Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);
                     bender.GetComponent<Bender>().Owner = PlayerControllers[i];
@@ -133,12 +133,12 @@ public class GameController : MonoBehaviour
         }
 
         int numAi = FindObjectsOfType<AIAgent>().Count((AIAgent ai) => ai.GetComponentInChildren<Bender>() != null);
-        int numPlayers = FindObjectsOfType<PlayerController>().Count((PlayerController player) => player.GetComponentInChildren<Bender>() != null);
+        int numPlayers = FindObjectsOfType<HumanController>().Count((HumanController player) => player.GetComponentInChildren<Bender>() != null);
 
         Debug.Log(numAi);
         Debug.Log(numPlayers);
 
-        if (numPlayers-1 == 0)
+        if (numPlayers == 0)
         {
             MatchSettings.WinnerTeam = 1;
             SceneManager.LoadScene("Menu");
