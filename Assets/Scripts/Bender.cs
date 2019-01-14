@@ -280,7 +280,10 @@ public abstract class Bender : MonoBehaviour
             BenderAnimator.SetBool("Moving", false);
             if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
             {
-                NavAgent.isStopped = true;
+                if (NavAgent.isActiveAndEnabled)
+                {
+                    NavAgent.isStopped = true;
+                }
             }
             Debug.Log(Name + ": Got hit!");
         }
@@ -323,11 +326,10 @@ public abstract class Bender : MonoBehaviour
         State = States.Idle;
         if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
-            try
+            if (NavAgent.isActiveAndEnabled)
             {
                 NavAgent.isStopped = false;
             }
-            catch (System.Exception ex) { }
         }
     }
 
