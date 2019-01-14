@@ -40,5 +40,10 @@ public abstract class PlayerController : MonoBehaviour
                 bender.NavAgent.enabled = false;
             }
         }
+        TextMirror mirrorUtil = UIIconContainer.GetComponent<TextMirror>();
+        if (mirrorUtil != null)
+        {
+            mirrorUtil.Mirror();
+        }
     }
 }

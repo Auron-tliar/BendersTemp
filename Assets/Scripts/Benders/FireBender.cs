@@ -5,6 +5,8 @@ using UnityEngine;
 public class FireBender : Bender
 {
     public GameObject FirePushPrefab;
+    public GameObject FireUnfreezePrefab;
+    public GameObject FireObstacleSpawnerPrefab;
 
     private float _startTime;
 
@@ -23,6 +25,11 @@ public class FireBender : Bender
         switch (State)
         {
             case States.Casting1:
+                Projectile projectileUnfreeze = Instantiate(FireUnfreezePrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectileUnfreeze.SetDirection(Name, transform.forward);
+                FinishCast();
+                break;
             case States.Casting2:
                 Projectile projectilePush = Instantiate(FirePushPrefab, ProjectileSpawnPoint.position,
                     new Quaternion()).GetComponent<Projectile>();
@@ -30,9 +37,9 @@ public class FireBender : Bender
                 FinishCast();
                 break;
             case States.Casting3:
-
-                // !!!!!!!!!!! Recover !!!!!!!!!!!!!!!! //
-
+                Projectile projectileObstacle = Instantiate(FireObstacleSpawnerPrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectileObstacle.SetDirection(Name, transform.forward + transform.up);
                 FinishCast();
                 break;
             default:

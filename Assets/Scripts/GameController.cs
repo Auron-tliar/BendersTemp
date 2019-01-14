@@ -100,6 +100,7 @@ public class GameController : MonoBehaviour
 
                     aiAgent.GetComponent<AIAgent>().brain = brain;
                     //aiAgent.GetComponent<AIAgent>().randomActionProbabiliy = 0.1f;
+
                     aiAgent.GetComponent<AIAgent>().noActionInterval = 20;
 
                     GameObject bender = Instantiate(temp, SpawnPoints[i].GetChild(j).position, Quaternion.identity, aiAgent.transform);

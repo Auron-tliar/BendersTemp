@@ -15919,12 +15919,17 @@ MonoBehaviour:
   FallSound: {fileID: 8300000, guid: 8dfc580618850428e904fc73c87a36db, type: 3}
   AbilitySound: {fileID: 8300000, guid: 1d36a037d45e9424193aef68f086ba21, type: 3}
   PortraitSprite: {fileID: 21300000, guid: b79721f7ab0ba58479642f29c0a21104, type: 3}
+  RecoveringDuration: 55
   BenderAnimator: {fileID: 0}
   SpeedInput: 0
   RotationSpeedInput: 0
   AbilitySelector: -1
   NavAgent: {fileID: 0}
   FirePushPrefab: {fileID: 1984157427519418, guid: 3f2285d1a84758447988f7ad5cb252e3,
+    type: 3}
+  FireUnfreezePrefab: {fileID: 1984157427519418, guid: 38ab926538c2c464a9d2a38553e251a9,
+    type: 3}
+  FireObstacleSpawnerPrefab: {fileID: 1984157427519418, guid: 48b76a9ff3b842943a0f658ab889bf8e,
     type: 3}
 --- !u!1 &1663826938549532
 GameObject:

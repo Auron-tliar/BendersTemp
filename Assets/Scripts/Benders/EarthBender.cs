@@ -5,6 +5,8 @@ using UnityEngine;
 public class EarthBender : Bender
 {
     public GameObject EarthPushPrefab;
+    public GameObject EarthBlockPrefab;
+    public GameObject EarthObstacleSpawnerPrefab;
 
     private float _startTime;
 
@@ -31,6 +33,11 @@ public class EarthBender : Bender
         switch (State)
         {
             case States.Casting1:
+                Projectile projectileBlock = Instantiate(EarthBlockPrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectileBlock.SetDirection(Name, transform.forward);
+                FinishCast();
+                break;
             case States.Casting2:
                 Projectile projectilePush = Instantiate(EarthPushPrefab, ProjectileSpawnPoint.position,
                     new Quaternion()).GetComponent<Projectile>();
@@ -38,6 +45,10 @@ public class EarthBender : Bender
                 FinishCast();
                 break;
             case States.Casting3:
+                Projectile projectileObstacle = Instantiate(EarthObstacleSpawnerPrefab, ProjectileSpawnPoint.position,
+                    new Quaternion()).GetComponent<Projectile>();
+                projectileObstacle.SetDirection(Name, transform.forward + transform.up);
+                FinishCast();
                 break;
             default:
                 break;
