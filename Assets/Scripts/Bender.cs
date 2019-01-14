@@ -323,7 +323,11 @@ public abstract class Bender : MonoBehaviour
         State = States.Idle;
         if (_owner.Type == PlayerController.PlayerTypes.HumanMouse)
         {
-            NavAgent.isStopped = false;
+            try
+            {
+                NavAgent.isStopped = false;
+            }
+            catch (System.Exception ex) { }
         }
     }
 

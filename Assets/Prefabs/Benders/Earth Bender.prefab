@@ -16359,12 +16359,17 @@ MonoBehaviour:
   FallSound: {fileID: 8300000, guid: 8dfc580618850428e904fc73c87a36db, type: 3}
   AbilitySound: {fileID: 8300000, guid: 1db6c3b857876a74ca886865c20d87f4, type: 3}
   PortraitSprite: {fileID: 21300000, guid: 87c8cc2c3c023b24fa646e4819428b2e, type: 3}
+  RecoveringDuration: 55
   BenderAnimator: {fileID: 0}
   SpeedInput: 0
   RotationSpeedInput: 0
   AbilitySelector: -1
   NavAgent: {fileID: 0}
   EarthPushPrefab: {fileID: 1984157427519418, guid: 858328c9eeb6a234ea79b98dcfbe865f,
+    type: 3}
+  EarthBlockPrefab: {fileID: 1984157427519418, guid: eb031a6f311e8b84d8350add0b991fb1,
+    type: 3}
+  EarthObstacleSpawnerPrefab: {fileID: 1984157427519418, guid: 585081ad3fbc4f04395df79cfc24741a,
     type: 3}
 --- !u!1 &1791803489710756
 GameObject:
