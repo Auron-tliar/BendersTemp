@@ -133,18 +133,23 @@ public class GameController : MonoBehaviour
             PlayNextTrack();
         }
 
+        int numAiControllers = FindObjectsOfType<AIAgent>().Count();
+        int numHumanControllers = FindObjectsOfType<HumanController>().Count();
+
         int numAi = FindObjectsOfType<AIAgent>().Count((AIAgent ai) => ai.GetComponentInChildren<Bender>() != null);
         int numPlayers = FindObjectsOfType<HumanController>().Count((HumanController player) => player.GetComponentInChildren<Bender>() != null);
+
+        int defeatedPLayers = FindObjectsOfType<PlayerController>().Count(player => player.GetComponentInChildren<Bender>() == null);
 
         Debug.Log(numAi);
         Debug.Log(numPlayers);
 
-        if (numPlayers == 0)
+        if (numPlayers == 0 && numHumanControllers > 0)
         {
             MatchSettings.WinnerTeam = 1;
             SceneManager.LoadScene("Menu");
         }
-        else if(numAi == 0)
+        else if((numAi == 0 && numAiControllers > 0) || defeatedPLayers > 0)
         {
             MatchSettings.WinnerTeam = 0;
             SceneManager.LoadScene("Menu");
